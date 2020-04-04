@@ -21,35 +21,25 @@ Librairies :
 ## Créer un bot pour mattermost
 
 L'aide de Mattermost [ici](https://docs.mattermost.com/developer/bot-accounts.html)  et [là](https://docs.mattermost.com/developer/bot-accounts.html#bot-account-creation) explique comment créer un bot.
-Il faut d'abord autoriser la création de bots ainsi que celles de webhook,
+
+Il faut d'abord autoriser la création de bots ainsi que [celles de webhook](https://docs.mattermost.com/developer/webhooks-outgoing.html),
 qui permettent au bot de lire les messages d'un canal.
 
-Robert répond à la fois aux messages privés et aux messages publics sur un canal.
+**Robert** répond à la fois aux messages privés et aux messages publics sur un canal.
 
 
+## Superpouvoirs de Robert
 
-et d'autres trucs marrants (mais faisables)
-* python eval bot
-  * [+] cool, pratique pour vérifier rapidement
-  * [-] dangereux, pénible à programmer (mais existe déjà !)
-* classroom api :
-  * dernier devoirs
-  * résumé de tous les devoirs
-  * devoirs en cours
-  * créer un lien vers les documents facilement accessible !
-  * https://stackoverflow.com/questions/56327781/how-can-i-use-a-google-classroom-api-on-a-website-i-am-making-to-access-specific
-  * [+] pratique
-  * [-] n'existe sûrement pas
 
-* Assiduité
-  * dernières visites, fréquence, nb de visite, nb de posts
-  * [+] utile
-  * [-] un peu flippant, faut vraiment limiter l'usage
+* [x] **`!robert help`** (ou **aide**) : affiche ce message d'**aide**,
+* [x] **`!robert date`** (ou **`heure`** ou **`aujourd'hui`**) : affiche **l'heure**,
+* [x] **`!robert python {nom_d_objet}`** : affiche l'aide d'un objet **python**,
+* [x] **`!robert latex {syntaxe latex}`** : tente d'évaluer une commande **latex**. J'arrondis la valeur après 4 décimales.
+* [x] **`!robert travail [nombre]`** (**`nombre`** est optionnel) : affiche une brève description des derniers travaux déposés sur classroom.
+* [ ] _`!robert assiduite \@personne_ : affiche des infos sur le compte : dernière connexion etc. _PAS ENCORE DÉVELOPPÉ_.
 
-## Token
+Il reconnait aussi la syntaxe latex :
 
-Votre compte de bot qkzkbot a été créé avec succès. Veuillez utiliser un des jetons d'accès suivants pour connecter le bot. Consultez notre documentation pour en savoir plus.
-
-Jeton :
-
-Veuillez vous assurer d'ajouter ce compte utilisateur de bot aux équipes et canaux avec lesquels vous voulez voir ce bot interagir. Veuillez vous référer à notre documentation pour en savoir plus.
+\`\`\`_latex_
+{syntaxe latex}
+\`\`\`
