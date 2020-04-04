@@ -1,28 +1,32 @@
+---
+  title: Robert le robot
+  author: qkzk
+  date: 2020/04/04
+---
+
 # Robert le robot
+
+## Présentation
+
+**Robert le robot** est un bot en python pour [Mattermost](https://mattermost.org).
+Une fois la configuration effectuée (à la main !) il peut répondre à différentes commandes.
+
+Librairies :
+
+* [mattermostdriver](https://github.com/Vaelor/python-mattermost-driver) permet de contrôler le bot et de créer des webhooks
+* [pyaml](https://pypi.org/project/PyYAML/) pour lire les fichiers de configuration
+* [google classroom](https://developers.google.com/classroom/quickstart/python)
+* [sympy](https://www.sympy.org/en/index.html) pour évaluer les commandes latex. Ce parser nécessite aussi [antlr4-python3-runtime](https://pypi.org/project/antlr4-python3-runtime/)
 
 ## Créer un bot pour mattermost
 
-## contrôler un bot avec Python
+L'aide de Mattermost [ici](https://docs.mattermost.com/developer/bot-accounts.html)  et [là](https://docs.mattermost.com/developer/bot-accounts.html#bot-account-creation) explique comment créer un bot.
+Il faut d'abord autoriser la création de bots ainsi que celles de webhook,
+qui permettent au bot de lire les messages d'un canal.
 
-librairie
+Robert répond à la fois aux messages privés et aux messages publics sur un canal.
 
-action réaction
 
-## Next step
-
-refactorer, documenter, créer un dépôt, pip freeze et tout ça
-réfléchir à un moyen de déployer directement sur la vm à côté du serveur
-
-## Idées
-bon les jeunes, discord c'est super et tout. Mais j'aime pas du tout l'idée que vos données soient revendues dans votre dos.
-Les miennes non plus d'ailleurs.
-Pour cette année, c'est mort, on va pas tout changer mais l'an prochain on utilisera autre chose d'aussi puissant pour échanger facilement à l'écrit
-Donc... je commence à réflechir à ce qu'on pourrait demander d'utile à un bot
-Projet (pour moi, paniquez pas) : **Robert le Robot**
-
-* !robert devoirs : lister les travaux sur classroom
-* !robert python print : affiche l'aide d'une fonction
-* !robert eval for lettre in 'robert': print(lettre) : execute une commande sécurisée et affiche sa sortie
 
 et d'autres trucs marrants (mais faisables)
 * python eval bot

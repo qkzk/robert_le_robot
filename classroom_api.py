@@ -1,8 +1,22 @@
+__title__='''Classroom API'''
+__author__='''qkzk'''
+__date__='''2020/04/04'''
+__doc__='''
+titre:   {0}
+author:  {1}
+date:    {2}
+
+Simple API pour communiquer facilement avec google classroom :
+
+1. récupérer une liste de cours sur classroom,
+2. ajouter un travail à une classe
+3. récupérer les derniers travaux d'une classe
+
+'''.format(__title__, __author__, __date__)
 # standard library
 import pickle
 import os.path
 from datetime import datetime
-# from dateutil.parser import parse
 from pprint import pprint
 
 # google
