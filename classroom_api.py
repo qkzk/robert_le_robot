@@ -103,10 +103,16 @@ def tester_tlm():
     assert my_courses == get_courses()
 
 
-def create_work():
+def create_work(content=None, course_id=None):
+    '''
+    Ajoute le travail au cours en question.
+    Retourne l'ensemble du travail ajouté.
+    '''
     service = create_service()
-    course_id = my_courses['Test 2019']['id']
-    contenu = {
+    if course_id is None:
+        course_id = my_courses['Test 2019']['id']
+    if content is None:
+        content = {
         'title': 'Le titre - from python',
         'description': '''Le contenu de la description
 voilà sur plusieurs ligne
@@ -131,11 +137,12 @@ un nouveau retour à la ligne
     }
 
     course_work = service.courses().courseWork().create(
-        courseId=course_id, body=contenu).execute()
+        courseId=course_id, body=content).execute()
     print('Assignment created with ID {0}'.format(course_work.get('id')))
 
 
 def get_work_list(course_id=None):
+    '''retourne la liste des derniers travaux d'un cours'''
     service = create_service()
     if course_id is None:
         tag = 'NSI'
@@ -146,6 +153,7 @@ def get_work_list(course_id=None):
 
 
 def parse_work_list(work_list, how_many=1, course_id=None):
+    '''traite une liste de travaux. Retourne un texte formatté markdown'''
     # print(len(work_list))
     how_many = min(len(work_list), how_many)
     complete_string = ''
@@ -165,6 +173,7 @@ def parse_work_list(work_list, how_many=1, course_id=None):
 
 
 def get_modele():
+    '''Récupère le modèle de présentation des travaux classroom'''
     with open(PATH_MODELE) as f:
         content = f.read().strip()
     return content
