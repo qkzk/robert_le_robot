@@ -146,3 +146,5 @@ static
 /config/*
 /config/token
 /config/config.yml
+secret
+credentials.json
