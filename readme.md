@@ -36,7 +36,7 @@ qui permettent au bot de lire les messages d'un canal.
 * [x] **`!robert python {nom_d_objet}`** : affiche l'aide d'un objet **python**,
 * [x] **`!robert latex {syntaxe latex}`** : tente d'évaluer une commande **latex**. J'arrondis la valeur après 4 décimales.
 * [x] **`!robert travail [nombre]`** (**`nombre`** est optionnel) : affiche une brève description des derniers travaux déposés sur classroom.
-* [ ] _`!robert assiduite \@personne_ : affiche des infos sur le compte : dernière connexion etc. _PAS ENCORE DÉVELOPPÉ_.
+* [ ] _`!robert assiduite \@personne`_ : affiche des infos sur le compte : dernière connexion etc. _PAS ENCORE DÉVELOPPÉ_.
 
 Il reconnait aussi la syntaxe latex :
 
