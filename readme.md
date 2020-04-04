@@ -6,6 +6,8 @@
 
 # Robert le robot
 
+![Robert le robot](./img/robert_le_robot.png)
+
 ## Présentation
 
 **Robert le robot** est un bot en python pour [Mattermost](https://mattermost.org).
