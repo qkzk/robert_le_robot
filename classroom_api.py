@@ -1,23 +1,28 @@
-# from __future__ import print_function
+# standard library
 import pickle
 import os.path
 from pprint import pprint
 
+# google
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
+# perso
+from classroom_courses import courses_name, my_courses
+
 # If modifying these scopes, delete the file token.pickle.
-SCOPES = ['https://www.googleapis.com/auth/classroom.courses.readonly']
+# SCOPES = ['https://www.googleapis.com/auth/classroom.courses.readonly']
+# https://www.googleapis.com/auth/classroom.courses
+# https://www.googleapis.com/auth/classroom.coursework.me
+# https: // www.googleapis.com/auth/classroom.coursework.students
+SCOPES = ['https://www.googleapis.com/auth/classroom.coursework.students']  # modifier les travaux
 
 
-courses_name = ['NSI', 'ISN', 'Aéro 2020', '2nde - 2020', 'Test 2019']
-
-
-def main():
-    """Shows basic usage of the Classroom API.
-    Prints the names of the first 10 courses the user has access to.
-    """
+def create_service():
+    '''
+    return a service provider
+    '''
     creds = None
     # The file token.pickle stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
@@ -38,7 +43,15 @@ def main():
             pickle.dump(creds, token)
 
     service = build('classroom', 'v1', credentials=creds)
+    return service
 
+
+def get_courses(service=None):
+    """Shows basic usage of the Classroom API.
+    return the courses that matches the tag names
+    """
+    if service is None:
+        service = create_service()
     # Call the Classroom API
     results = service.courses().list(pageSize=1000).execute()
     courses = results.get('courses', [])
@@ -46,7 +59,7 @@ def main():
     if not courses:
         print('No courses found.')
     else:
-        print('Courses:')
+        # print('Courses:')
         for course in courses:
             name = course['name']
             for tag in courses_name:
@@ -62,8 +75,44 @@ def main():
                         'calendarId': course['calendarId'],
                         'courseGroupEmail': course['courseGroupEmail']
                     }
-    pprint(my_courses)
+    return my_courses
+
+
+def tester_tlm():
+    assert my_courses == get_courses()
+
+
+def create_work():
+    service = create_service()
+    course_id = my_courses['Test 2019']['id']
+    courseWork = {
+        'title': 'Le titre - from python',
+        'description': '''Le contenu de la description
+voilà sur plusieurs ligne
+un nouveau retour à la ligne
+
+**du gras avec MD ?**
+
+* une liste md ???
+
+# Un titre md ??
+
+<ul>
+    <li>une liste html ?</li>
+</ul>
+        ''',
+        'materials': [
+            {'link': {'url': 'https://qkzk.xyz/content/nsi'}},
+            {'link': {'url': 'https://qkzk.xyz/content/isn'}}
+        ],
+        'workType': 'ASSIGNMENT',
+        'state': 'PUBLISHED',
+    }
+
+    courseWork = service.courses().courseWork().create(
+        courseId=course_id, body=courseWork).execute()
+    print('Assignment created with ID {0}'.format(courseWork.get('id')))
 
 
 if __name__ == '__main__':
-    main()
+    create_work()

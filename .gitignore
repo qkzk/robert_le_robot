@@ -149,4 +149,6 @@ static
 secret
 credentials.json
 token.pickle
+*.pickle*
+*token*
 classroom_courses.py
