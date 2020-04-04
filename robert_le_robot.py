@@ -23,6 +23,7 @@ A l'heure actuelle il peut :
 
 '''.format(__title__, __author__, __date__)
 
+# standard library
 import asyncio
 import datetime
 import json
@@ -30,9 +31,13 @@ import pydoc
 import sys
 from pprint import pprint
 
+# community
 from mattermostdriver import Driver
 import yaml
 from sympy.parsing.latex import parse_latex
+
+# own
+from classroom_api import retrieve_parse_works
 
 # Globals
 
@@ -194,8 +199,24 @@ def bot_replies(command, driver=None, latex_syntax=False, channel_id=None):
 
 def bot_command_options(command, channel_id, latex_syntax=False):
     '''choisit la bonne réaction et construit la réponse du bot'''
-
-    if command in ['help', 'aide']:
+    if VERBOSE:
+        print("\n##############################################\n")
+        print("bot_command_options received", command)
+    if 'travail' in command:
+        if VERBOSE:
+            print('command : travail !')
+        last_param = command.split(' ')[-1]
+        print("last_param")
+        print(last_param)
+        try:
+            how_many = int(last_param)
+        except ValueError as e:
+            print(repr(e))
+            how_many = 1
+        if VERBOSE:
+            print(how_many)
+        answer = retrieve_parse_works(how_many=how_many)
+    elif command in ['help', 'aide']:
         with open(HELP_FILE) as f:
             answer = f.read()
 
@@ -215,6 +236,7 @@ def bot_command_options(command, channel_id, latex_syntax=False):
             answer = latex_evaluate_command(latex_command)
         except Exception as e:
             answer = '_Expression invalide_'
+
     else:
         answer = command
 
