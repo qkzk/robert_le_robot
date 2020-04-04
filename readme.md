@@ -40,6 +40,8 @@ qui permettent au bot de lire les messages d'un canal.
 
 Il reconnait aussi la syntaxe latex :
 
-\`\`\`_latex_
+\`\`\`latex
+
 {syntaxe latex}
+
 \`\`\`
