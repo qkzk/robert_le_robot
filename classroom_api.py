@@ -1,12 +1,17 @@
-from __future__ import print_function
+# from __future__ import print_function
 import pickle
 import os.path
+from pprint import pprint
+
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/classroom.courses.readonly']
+
+
+courses_name = ['NSI', 'ISN', 'Aéro 2020', '2nde - 2020', 'Test 2019']
 
 
 def main():
@@ -35,15 +40,29 @@ def main():
     service = build('classroom', 'v1', credentials=creds)
 
     # Call the Classroom API
-    results = service.courses().list(pageSize=10).execute()
+    results = service.courses().list(pageSize=1000).execute()
     courses = results.get('courses', [])
-
+    my_courses = {}
     if not courses:
         print('No courses found.')
     else:
         print('Courses:')
         for course in courses:
-            print(course['name'])
+            name = course['name']
+            for tag in courses_name:
+                if tag in name:
+                    # print('\n', course['name'])
+                    # pprint(course['id'])
+                    my_courses[tag] = {
+                        'tag': tag,
+                        'name': course['name'],
+                        'id': course['id'],
+                        'courseGroupEmail': course['courseGroupEmail'],
+                        'enrollmentCode': course['enrollmentCode'],
+                        'calendarId': course['calendarId'],
+                        'courseGroupEmail': course['courseGroupEmail']
+                    }
+    pprint(my_courses)
 
 
 if __name__ == '__main__':

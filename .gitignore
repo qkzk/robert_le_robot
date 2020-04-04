@@ -148,4 +148,5 @@ static
 /config/config.yml
 secret
 credentials.json
-tocken.pickle
+token.pickle
+classroom_courses.py
