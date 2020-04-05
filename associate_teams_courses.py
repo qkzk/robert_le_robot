@@ -1,3 +1,8 @@
+'''
+réalise automatique l'association entre les teams (déjà crées, contenant le bot)
+et les classrooms auquel l'utilisateur a accès.
+'''
+
 # standard library
 from shutil import copy
 from pprint import pprint
@@ -19,13 +24,18 @@ PATH_BACKUP = './config/team_classroom_backup.yml'
 
 
 def associate_team_classroom():
+    print("Voici le contenu actuel du fichier d'association")
+    read_association_file()
+    clean_file_input = input(
+        "Voulez-vous commencer l'association ? Cela effacera le fichier [y/N] ")
+    if clean_file_input.lower() in 'yes':
+        clean_file_association()
+    else:
+        print("Le fichier est conservé")
+        return
 
     classroom_courses = print_courses()
     mattermost_teams = display_teams()
-
-    clean_file_input = input("Voulez-vous effacer le précédent fichier d'association ? [y/N]")
-    if clean_file_input.lower() in 'yes':
-        clean_file_association()
 
     association = {}
     for team in mattermost_teams:
@@ -85,8 +95,16 @@ def associate_team_classroom():
 
 
 def read_association_file():
-    with open(PATH_ASSOCIATION) as f:
-        content = f.read()
+    '''
+    affiche à l'écran le contenu du fichier d'association actuel
+    Attention, ce n'est pas encore le fichier utilisé par Robert
+    '''
+    content = ''
+    try:
+        with open(PATH_ASSOCIATION) as f:
+            content = f.read()
+    except FileNotFoundError as e:
+        print("le fichier d'association n'a pas été crée")
     print(content)
 
 
@@ -103,10 +121,15 @@ def write_association(team_id, classroom_id):
 
 
 def clean_file_association():
+    '''vide le contenu du fichier d'association'''
     open(PATH_ASSOCIATION, 'w').close()
 
 
 def copy_associations():
+    '''
+    copie le fichier d'association pour être utilisé par robert
+    garde du copie de la précédente configuration
+    '''
     copy(PATH_TEAM_CLASSROOM, PATH_BACKUP)
     copy(PATH_ASSOCIATION, PATH_TEAM_CLASSROOM)
 
