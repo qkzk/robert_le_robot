@@ -80,8 +80,8 @@ Les étapes suivantes permettent d'utiliser l'API de google classroom.
 
 3. **credentials.json** Ce sont les autorisations générales du compte google classroom.
 
-  Suivez le tutoriel de google classroom et copiez les dans [credentials.json](./config/credentials.json)
-  Attention, pour éviter d'encombrer le dossier racine, l'adresse par défaut du tutoriel a été changée.
+    Suivez le tutoriel de google classroom et copiez les dans [credentials.json](./config/credentials.json)
+    Attention, pour éviter d'encombrer le dossier racine, l'adresse par défaut du tutoriel a été changée.
 
 4. **token.pickle** C'est le token crée par google. Chaque niveau d'autorisation (lecture, édition et 20 variantes) correspond à un token.pickle différent. Le fichier est automatiquement crée par google. Si vous souhaitez adapter le bot et lui ajouter / retirer des autorisations il faut effacer ce fichier. Lors du lancement du bot, vous verrez un lien dans la console. Ouvrez le dans le navigateur,
 cliquez oui (ou non si vous ne voulez pas mais alors pourquoi vous lisez ça ?) et le script va créer le fichier automatiquement.
