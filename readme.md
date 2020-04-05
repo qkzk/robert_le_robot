@@ -105,29 +105,29 @@ cliquez oui (ou non si vous ne voulez pas mais alors pourquoi vous lisez ça ?) 
 
     2. _Avec un peu d'aide._ (si vous n'avez pas confiance)
 
-      1. **Exécuter le fichier** [display_teams.py](.\display_teams.py). Attention, vous devez déjà avoir configuré le bot (étapes 1 à 4).
+        1. **Exécuter le fichier** [display_teams.py](.\display_teams.py). Attention, vous devez déjà avoir configuré le bot (étapes 1 à 4).
 
-        Les noms des équipes ainsi que les `team_id` apparaissent à l'écran. Copiez les `team_id` qui vous intéressent.
+          Les noms des équipes ainsi que les `team_id` apparaissent à l'écran. Copiez les `team_id` qui vous intéressent.
 
-        **Attention** dans l'étape 1, vous devez avoir été jusqu'au bout et avoir ajouté Robert aux bonnes équipes. Vous ne verrez que les équipes contenant Robert !
+          **Attention** dans l'étape 1, vous devez avoir été jusqu'au bout et avoir ajouté Robert aux bonnes équipes. Vous ne verrez que les équipes contenant Robert !
 
-      2. **Exécuter le fichier** [display_classroom_courses.py](.\display_classroom_courses.py).
+        2. **Exécuter le fichier** [display_classroom_courses.py](.\display_classroom_courses.py).
 
-          Il affiche tous les noms et `course_id` des classes accessibles par votre compte.
-          Malheureusement, le niveau d'autorisation pour afficher les courses est différent de celui pour manipuler
-          les travaux d'une classe. Il faut donc recréer un fichier token.pickle pour ce niveau.
-          Ce processus est heureusement automatisé. Il suffit de cliquer le lien, autoriser dans le navigateur et laisser faire.
+            Il affiche tous les noms et `course_id` des classes accessibles par votre compte.
+            Malheureusement, le niveau d'autorisation pour afficher les courses est différent de celui pour manipuler
+            les travaux d'une classe. Il faut donc recréer un fichier token.pickle pour ce niveau.
+            Ce processus est heureusement automatisé. Il suffit de cliquer le lien, autoriser dans le navigateur et laisser faire.
 
-          Si vous avez un compte administrateur GSuite, vous verrez toutes les classes de l'établissement !
+            Si vous avez un compte administrateur GSuite, vous verrez toutes les classes de l'établissement !
 
-      3. **copiez les `courses_id`** dans le fichier [team_classroom.yml](`team_classroom.yml`)
+        3. **copiez les `courses_id`** dans le fichier [team_classroom.yml](`team_classroom.yml`)
 
-        Ce fichier _yaml_ doit respecter un format particulier :
+          Ce fichier _yaml_ doit respecter un format particulier :
 
-        ```yaml
-        'team_id_1': 'course_id_1'
-        'team_id_2': 'course_id_2'
-        'team_id_3': 'course_id_3'
-        ```
+          ```yaml
+          'team_id_1': 'course_id_1'
+          'team_id_2': 'course_id_2'
+          'team_id_3': 'course_id_3'
+          ```
 
       Afin de vérifier, connectez-vous à mattermost et, **pour chaque team**, demandez le travail avec `!robert travail`
