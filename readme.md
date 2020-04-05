@@ -97,10 +97,10 @@ cliquez oui (ou non si vous ne voulez pas mais alors pourquoi vous lisez ça ?) 
 
     1. _Automatiquement_ : **Exécuter le fichier** (méthode recommandée) [associate_team_classroom.py](.\associate_team_classroom.py)
 
-      Suivez les instructions à l'écran. La dernière étape vous propose de valider ce que vous avez fait.
-      Vous pouvez recommencer ce processus à tout moment.
-      Le script réalise les étapes suivantes tout seul et vous propose soit de saisir les `id_classroom`
-      Soit de les trouver lui-même à partir d'un mot clé. Ouvrez une page vers [classroom](https://classroom.google.com) afin de copier les noms exacts.
+        Suivez les instructions à l'écran. La dernière étape vous propose de valider ce que vous avez fait.
+        Vous pouvez recommencer ce processus à tout moment.
+        Le script réalise les étapes suivantes tout seul et vous propose soit de saisir les `id_classroom`
+        Soit de les trouver lui-même à partir d'un mot clé. Ouvrez une page vers [classroom](https://classroom.google.com) afin de copier les noms exacts.
 
 
     2. _Avec un peu d'aide._ (si vous n'avez pas confiance)
