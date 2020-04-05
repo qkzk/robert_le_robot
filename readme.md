@@ -106,9 +106,10 @@ cliquez oui (ou non si vous ne voulez pas mais alors pourquoi vous lisez ça ?) 
     2. _Avec un peu d'aide._ (si vous n'avez pas confiance)
 
         1. **Exécuter le fichier** [display_teams.py](.\display_teams.py). Attention, vous devez déjà avoir configuré le bot (étapes 1 à 4).
-          Les noms des équipes ainsi que les `team_id` apparaissent à l'écran. Copiez les `team_id` qui vous intéressent.
 
-          **Attention** dans l'étape 1, vous devez avoir été jusqu'au bout et avoir ajouté Robert aux bonnes équipes. Vous ne verrez que les équipes contenant Robert !
+            Les noms des équipes ainsi que les `team_id` apparaissent à l'écran. Copiez les `team_id` qui vous intéressent.
+
+            **Attention** dans l'étape 1, vous devez avoir été jusqu'au bout et avoir ajouté Robert aux bonnes équipes. Vous ne verrez que les équipes contenant Robert !
 
         2. **Exécuter le fichier** [display_classroom_courses.py](.\display_classroom_courses.py).
 
