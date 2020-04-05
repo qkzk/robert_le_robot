@@ -47,3 +47,77 @@ Il reconnait aussi la syntaxe latex :
 {syntaxe latex}
 
 \`\`\`
+
+## Configurer robert
+
+
+
+Pour l'instant c'est un processus fastidieux. L'un des objectifs est d'automatiser au maximum cette démarche.
+
+Les étapes 1 et 2 suffisent à utiliser les fonctions de base de Robert (sans classroom).
+Les étapes suivantes permettent d'utiliser l'API de google classroom.
+
+
+1. **Token** Robert est un bot, Mattermost permet aux bot de s'identifier directment par un token, sans utiliser d'email.
+
+    1. **Créer un compte de bot** directement dans la console système de votre serveur. **Copier le token**.
+    2. **Écriver le token** dans [token.robert](./config/token.robert)
+    3. **AJOUTER ROBERT AUX TEAMS**. Si le bot n'est pas dans une équipe, il ne pourra y poster. Cela se fait directement sur le serveur.
+    4. **Copier le nom d'utilisateur** que vous avez donné à Robert.
+
+       S'il est différent de `robert_le_robot`, modifiez la variable `BOT_USERNAME` dans [display_teams.py](./display_teams.py)
+
+2. **paramètres du serveur** Ils sont à écrire dans [config.yml](./config/config.yml)
+
+    Modifiez l'adresse et le port en respectant le format suivant :
+
+    ~~~yaml
+    basepath: /api/v4
+    debug: true
+    port: 443
+    url: adresse.du.serveur
+    ~~~
+
+3. **credentials.json** Ce sont les autorisations générales du compte google classroom.
+
+  Suivez le tutoriel de google classroom et copiez les dans [credentials.json](./config/credentials.json)
+  Attention, pour éviter d'encombrer le dossier racine, l'adresse par défaut du tutoriel a été changée.
+
+4. **token.pickle** C'est le token crée par google. Chaque niveau d'autorisation (lecture, édition et 20 variantes) correspond à un token.pickle différent. Le fichier est automatiquement crée par google. Si vous souhaitez adapter le bot et lui ajouter / retirer des autorisations il faut effacer ce fichier. Lors du lancement du bot, vous verrez un lien dans la console. Ouvrez le dans le navigateur,
+cliquez oui (ou non si vous ne voulez pas mais alors pourquoi vous lisez ça ?) et le script va créer le fichier automatiquement.
+
+    La configuration par défaut est "lecture et écriture des **devoirs**, pas des classes".
+
+5. **team_classroom.yml** C'est le plus pénible.
+
+  Ce fichier fait l'association entre une équipe (mattermost) et une classe (classroom).
+  Pour l'adapter il faut récupérer les bonnes id des équipes.
+
+  1. **Exécuter le fichier** [display_teams.py](.\display_teams.py). Attention, vous devez déjà avoir configuré le bot (étapes 1 à 4).
+
+    Les noms des équipes ainsi que les `team_id` apparaissent à l'écran. Copiez les `team_id` qui vous intéressent.
+
+    **Attention** dans l'étape 1, vous devez avoir été jusqu'au bout et avoir ajouté Robert aux bonnes équipes. Vous ne verrez que les équipes contenant Robert !
+
+  2. **Exécuter le fichier** [display_classroom_courses.py](.\display_classroom_courses.py).
+
+      Il affiche tous les noms et `course_id` des classes accessibles par votre compte.
+      Malheureusement, le niveau d'autorisation pour afficher les courses est différent de celui pour manipuler
+      les travaux d'une classe. Il faut donc recréer un fichier token.pickle pour ce niveau.
+      Ce processus est heureusement automatisé. Il suffit de cliquer le lien, autoriser dans le navigateur et laisser faire.
+
+      Si vous avez un compte administrateur GSuite, vous verrez toutes les classes de l'établissement !
+
+  3. **copiez les `courses_id`** dans le fichier [team_classroom.yml](`team_classroom.yml`)
+
+    Ce fichier _yaml_ doit respecter un format particulier :
+
+    ```yaml
+    'team_id_1': 'course_id_1'
+    'team_id_2': 'course_id_2'
+    'team_id_3': 'course_id_3'
+    ```
+
+  4. Connectez-vous à mattermost et, **pour chaque team**, demandez le travail avec `!robert travail`
+
+    Je sais qu'on peut faire mieux, ce sera simplifié dans une prochaine version.

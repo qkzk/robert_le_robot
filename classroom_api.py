@@ -19,6 +19,9 @@ import os.path
 from datetime import datetime
 from pprint import pprint
 
+# community
+import yaml
+
 # google
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -35,12 +38,12 @@ from classroom_courses import courses_name, my_courses
 
 SCOPES = ['https://www.googleapis.com/auth/classroom.coursework.students']  # modifier les travaux
 
-PATH_MODELE = './responses/modele.md'
+PATH_TEMPLATE_FORMAT_CLASSROOM = './responses/template_format_classroom.md'
 PATH_TOKEN_PICKLE = './config/token.pickle'
 PATH_CREDENTIALS = './config/credentials.json'
 
 
-def create_service():
+def create_service(path_token_pickle=None, scopes=None):
     '''
     return a service provider
     '''
@@ -48,8 +51,12 @@ def create_service():
     # The file token.pickle stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
     # time.
-    if os.path.exists(PATH_TOKEN_PICKLE):
-        with open(PATH_TOKEN_PICKLE, 'rb') as token:
+    if path_token_pickle is None:
+        path_token_pickle = PATH_TOKEN_PICKLE
+    if scopes is None:
+        scopes = SCOPES
+    if os.path.exists(path_token_pickle):
+        with open(path_token_pickle, 'rb') as token:
             creds = pickle.load(token)
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
@@ -57,22 +64,24 @@ def create_service():
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
-                PATH_CREDENTIALS, SCOPES)
+                PATH_CREDENTIALS, scopes)
             creds = flow.run_local_server(port=0)
         # Save the credentials for the next run
-        with open(PATH_TOKEN_PICKLE, 'wb') as token:
+        with open(path_token_pickle, 'wb') as token:
             pickle.dump(creds, token)
 
     service = build('classroom', 'v1', credentials=creds)
     return service
 
 
-def get_courses(service=None):
+def get_courses(service=None, scopes=None,
+                path_token_pickle=None, by_tag_name=True):
     """Shows basic usage of the Classroom API.
     return the courses that matches the tag names
     """
     if service is None:
-        service = create_service()
+        service = create_service(scopes=scopes,
+                                 path_token_pickle=path_token_pickle)
     # Call the Classroom API
     results = service.courses().list(pageSize=1000).execute()
     courses = results.get('courses', [])
@@ -81,21 +90,30 @@ def get_courses(service=None):
         print('No courses found.')
     else:
         # print('Courses:')
-        for course in courses:
-            name = course['name']
-            for tag in courses_name:
-                if tag in name:
-                    # print('\n', course['name'])
-                    # pprint(course['id'])
-                    my_courses[tag] = {
-                        'tag': tag,
-                        'name': course['name'],
+        if by_tag_name:
+            for course in courses:
+                name = course['name']
+                for tag in courses_name:
+                    if tag in name:
+                        # print('\n', course['name'])
+                        # pprint(course['id'])
+                        my_courses[tag] = {
+                            'tag': tag,
+                            'name': course['name'],
+                            'id': course['id'],
+                            'courseGroupEmail': course['courseGroupEmail'],
+                            'enrollmentCode': course['enrollmentCode'],
+                            'calendarId': course['calendarId'],
+                            'courseGroupEmail': course['courseGroupEmail']
+                            }
+        else:
+            # toutes les classes, attention...
+            my_courses = []
+            for course in courses:
+                my_courses.append({
                         'id': course['id'],
-                        'courseGroupEmail': course['courseGroupEmail'],
-                        'enrollmentCode': course['enrollmentCode'],
-                        'calendarId': course['calendarId'],
-                        'courseGroupEmail': course['courseGroupEmail']
-                    }
+                        'name': course['name']
+                    })
     return my_courses
 
 
@@ -145,6 +163,7 @@ def get_work_list(course_id=None):
     '''retourne la liste des derniers travaux d'un cours'''
     service = create_service()
     if course_id is None:
+        print("No course_id provided, default course_id used")
         tag = 'NSI'
         course_id = my_courses[tag]['id']
     work_data = service.courses().courseWork().list(
@@ -174,7 +193,7 @@ def parse_work_list(work_list, how_many=1, course_id=None):
 
 def get_modele():
     '''Récupère le modèle de présentation des travaux classroom'''
-    with open(PATH_MODELE) as f:
+    with open(PATH_TEMPLATE_FORMAT_CLASSROOM) as f:
         content = f.read().strip()
     return content
 
@@ -209,11 +228,14 @@ def format_work_mattermost(work_simplified=None):
     return string
 
 
-def retrieve_parse_works(how_many=1):
+def retrieve_parse_works(how_many=1, course_id=None):
     '''return a description of last classroom works for a given class'''
-    work_list = get_work_list(course_id=None)  # OK
+    work_list = get_work_list(course_id=course_id)  # OK
     return parse_work_list(work_list, how_many=how_many)
 
 
 if __name__ == '__main__':
-    print(retrieve_parse_works(how_many=2))
+    # associate_team_classroom()
+    # exit()
+    #   la suite est ok
+    print(retrieve_parse_works(how_many=2, course_id=None))
