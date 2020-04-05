@@ -93,31 +93,41 @@ cliquez oui (ou non si vous ne voulez pas mais alors pourquoi vous lisez ça ?) 
   Ce fichier fait l'association entre une équipe (mattermost) et une classe (classroom).
   Pour l'adapter il faut récupérer les bonnes id des équipes.
 
-  1. **Exécuter le fichier** [display_teams.py](.\display_teams.py). Attention, vous devez déjà avoir configuré le bot (étapes 1 à 4).
+  Deux méthodes pour remplir ce fichier.
 
-    Les noms des équipes ainsi que les `team_id` apparaissent à l'écran. Copiez les `team_id` qui vous intéressent.
+  1. _Automatiquement_ : **Exécuter le fichier** (méthode recommandée) [associate_team_classroom.py](.\associate_team_classroom.py)
 
-    **Attention** dans l'étape 1, vous devez avoir été jusqu'au bout et avoir ajouté Robert aux bonnes équipes. Vous ne verrez que les équipes contenant Robert !
+    Suivez les instructions à l'écran. La dernière étape vous propose de valider ce que vous avez fait.
+    Vous pouvez recommencer ce processus à tout moment.
+    Le script réalise les étapes suivantes tout seul et vous propose soit de saisir les `id_classroom`
+    Soit de les trouver lui-même à partir d'un mot clé. Ouvrez une page vers [classroom](https://classroom.google.com) afin de copier les noms exacts.
 
-  2. **Exécuter le fichier** [display_classroom_courses.py](.\display_classroom_courses.py).
 
-      Il affiche tous les noms et `course_id` des classes accessibles par votre compte.
-      Malheureusement, le niveau d'autorisation pour afficher les courses est différent de celui pour manipuler
-      les travaux d'une classe. Il faut donc recréer un fichier token.pickle pour ce niveau.
-      Ce processus est heureusement automatisé. Il suffit de cliquer le lien, autoriser dans le navigateur et laisser faire.
+  2. _Avec un peu d'aide._ (si vous n'avez pas confiance)
 
-      Si vous avez un compte administrateur GSuite, vous verrez toutes les classes de l'établissement !
+    1. **Exécuter le fichier** [display_teams.py](.\display_teams.py). Attention, vous devez déjà avoir configuré le bot (étapes 1 à 4).
 
-  3. **copiez les `courses_id`** dans le fichier [team_classroom.yml](`team_classroom.yml`)
+      Les noms des équipes ainsi que les `team_id` apparaissent à l'écran. Copiez les `team_id` qui vous intéressent.
 
-    Ce fichier _yaml_ doit respecter un format particulier :
+      **Attention** dans l'étape 1, vous devez avoir été jusqu'au bout et avoir ajouté Robert aux bonnes équipes. Vous ne verrez que les équipes contenant Robert !
 
-    ```yaml
-    'team_id_1': 'course_id_1'
-    'team_id_2': 'course_id_2'
-    'team_id_3': 'course_id_3'
-    ```
+    2. **Exécuter le fichier** [display_classroom_courses.py](.\display_classroom_courses.py).
 
-  4. Connectez-vous à mattermost et, **pour chaque team**, demandez le travail avec `!robert travail`
+        Il affiche tous les noms et `course_id` des classes accessibles par votre compte.
+        Malheureusement, le niveau d'autorisation pour afficher les courses est différent de celui pour manipuler
+        les travaux d'une classe. Il faut donc recréer un fichier token.pickle pour ce niveau.
+        Ce processus est heureusement automatisé. Il suffit de cliquer le lien, autoriser dans le navigateur et laisser faire.
 
-    Je sais qu'on peut faire mieux, ce sera simplifié dans une prochaine version.
+        Si vous avez un compte administrateur GSuite, vous verrez toutes les classes de l'établissement !
+
+    3. **copiez les `courses_id`** dans le fichier [team_classroom.yml](`team_classroom.yml`)
+
+      Ce fichier _yaml_ doit respecter un format particulier :
+
+      ```yaml
+      'team_id_1': 'course_id_1'
+      'team_id_2': 'course_id_2'
+      'team_id_3': 'course_id_3'
+      ```
+
+    Afin de vérifier, connectez-vous à mattermost et, **pour chaque team**, demandez le travail avec `!robert travail`
