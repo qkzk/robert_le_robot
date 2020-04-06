@@ -12,6 +12,7 @@ from sympy.parsing.latex import parse_latex
 
 # own
 from classroom_api import retrieve_parse_works
+from get_format_sessions import get_format_sessions
 
 __title__ = '''Robert le robot'''
 __author__ = '''qkzk'''
@@ -288,6 +289,16 @@ def bot_command_options(command, channel_id, team_id, latex_syntax=False):
             answer = latex_evaluate_command(latex_command)
         except Exception as e:
             answer = standard_answers['invalid_latex']
+
+    elif command.startswith("session"):
+        user_asked_about = command.split("session")[1].strip()
+        try:
+            answer = get_format_sessions(user_asked_about)
+            if answer == "":
+                answer = standard_answers['invalid_user']
+        except Exception as e:
+            print(repr(e))
+            answer = standard_answers['invalid_user']
 
     else:
         answer = standard_answers["cannot_do"]
