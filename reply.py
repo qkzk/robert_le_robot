@@ -96,6 +96,11 @@ class Reply:
             self.__response = ClearResponse(self.__channel_id,
                                             self.__sender_user_id)
 
+        elif self.__command in ['delete']:
+            self.__response = ClearResponse(self.__command,
+                                            self.__channel_id,
+                                            self.__sender_user_id)
+
         else:
             self.__response = CannotdoResponse()
 

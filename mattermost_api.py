@@ -140,8 +140,15 @@ def delete_posts_from_list_id(post_ids):
 
 
 def driver_create_login_get_info():
+    # TODO pourquoi retourner 3 TRUCS PUTAIN
     driver = create_driver()
     result = driver.login()
     bot_id = result.get("id")
     bot_username = result.get("username")
     return driver, bot_id, bot_username
+
+
+def get_posts_from_user(username):
+    _, __, driver = create_driver_and_login()  # TODO attention signature
+    # revoke all acive sessions /users/{user_id}/sessions/revoke/all
+    # Deactivate a user account./users/{user_id}
