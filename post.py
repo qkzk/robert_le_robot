@@ -6,22 +6,21 @@ from reply import Reply
 
 
 class Post:
-    def __init__(self, driver, msg_json_data_post, team_id):
-        self.__driver = driver
+    def __init__(self, msg_json_data_post, team_id):
         self.__msg_json_data_post = msg_json_data_post
         self.__team_id = team_id
         self.__deal_answer = False
         self.__latex_syntax = False
 
     @classmethod
-    def from_json(cls, msg_json, driver):
+    def from_json(cls, msg_json):
         if 'data' in msg_json and 'post' in msg_json['data']:
             msg_json_data_post = msg_json['data']['post']
             team_id = msg_json['data'].get('team_id')
             if VERBOSE:
                 print('classmethod : Post from_json')
                 pprint(msg_json_data_post)
-            return Post(driver, msg_json_data_post, team_id)
+            return Post(msg_json_data_post, team_id)
 
     def parse_post(self):
         '''
@@ -58,7 +57,6 @@ class Post:
 
             if self.__deal_answer:
                 reply = Reply(command,
-                              driver=self.__driver,
                               latex_syntax=self.__latex_syntax,
                               channel_id=channel_id,
                               team_id=self.__team_id)

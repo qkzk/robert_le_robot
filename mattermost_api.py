@@ -3,14 +3,6 @@ from pprint import pprint
 from constants import VERBOSE
 from constants import PATH_TOKEN_BOT
 from constants import PATH_OPTIONS_SERVER
-from constants import PATH_ANSWER_HELP
-from constants import PATH_STANDARD_ANSWERS
-from constants import PATH_TEAM_CLASSROOM
-from constants import START_COMMAND
-from constants import START_LATEX
-from constants import END_LATEX
-from constants import DATETIME_FORMAT
-from utils import get_standard_answers
 from utils import read_yaml_file
 from mattermostdriver import Driver
 

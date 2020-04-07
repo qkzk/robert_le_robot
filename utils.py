@@ -1,5 +1,6 @@
-from constants import PATH_STANDARD_ANSWERS
 import yaml
+
+from constants import PATH_STANDARD_ANSWERS
 
 
 def read_yaml_file(path):
