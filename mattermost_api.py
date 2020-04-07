@@ -44,6 +44,12 @@ def create_driver(options=None):
     return driver
 
 
+def create_driver_and_login(options=None):
+    driver = create_driver(options=None)
+    driver.login()
+    return driver
+
+
 def get_user(username, driver=None):
     '''Retourne les infos d'un utilisateur par son username'''
     if VERBOSE:
@@ -108,3 +114,34 @@ def get_user_audits_from_api(user_id, driver=None):
     if VERBOSE:
         pprint(audits)
     return audits
+
+
+def get_post_for_channel(channel_id):
+    driver = create_driver_and_login()
+    posts = driver.channels.get_posts(channel_id)
+    print("\n channel post ids :")
+    print("\nposts for channel {}".format(channel_id))
+    print(posts['order'])
+    return posts['order']
+
+
+def get_ids_from_posts(posts):
+    posts_ids = [post['id'] for post in posts]
+    print("\n get ids from posts")
+    print("the first ids i got are : ")
+    print(posts_ids[:100])
+    return posts_ids
+
+
+def delete_posts_from_list_id(post_ids):
+    driver = create_driver_and_login()
+    for post_id in post_ids:
+        driver.posts.delete_post(post_id)
+
+
+def driver_create_login_get_info():
+    driver = create_driver()
+    result = driver.login()
+    bot_id = result.get("id")
+    bot_username = result.get("username")
+    return driver, bot_id, bot_username

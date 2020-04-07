@@ -16,6 +16,8 @@ from utils import get_standard_answers, read_yaml_file
 from mattermost_api import get_user_by_id
 from mattermost_api import get_user
 from mattermost_api import get_user_sessions_from_api
+from mattermost_api import get_post_for_channel
+from mattermost_api import delete_posts_from_list_id
 
 
 ASSOCIATIONS_TEAM_CLASSROOM = read_yaml_file(PATH_TEAM_CLASSROOM)
@@ -58,28 +60,37 @@ class ClassroomResponse(Response):
     def answer(self):
         if VERBOSE:
             print('command : travail !')
-        last_param = self.__command.split(' ')[-1]
-        print("last_param")
-        print(last_param)
+
         try:
-            how_many = int(last_param)
-        except ValueError as e:
+            last_param = self.__command.split(' ')[-1]
+            print("last_param")
+            print(last_param)
+            can_continue = True
+        except (ValueError, TypeError) as e:
+            print("ClassroomResponse.answer : impossible to read the command")
             print(repr(e))
-            how_many = 1
-        if VERBOSE:
-            print(how_many)
+            answer = None
+            can_continue = False
+        if can_continue:
+            try:
+                how_many = int(last_param)
+            except ValueError as e:
+                print(repr(e))
+                how_many = 1
+            if VERBOSE:
+                print(how_many)
 
-        print("team_id", self.__team_id)
+            print("team_id", self.__team_id)
 
-        if self.__team_id is None or self.__team_id == '':
-            self.__team_id = get_team_from_channel(self.__channel_id)
+            if self.__team_id is None or self.__team_id == '':
+                self.__team_id = get_team_from_channel(self.__channel_id)
 
-        course_id = ASSOCIATIONS_TEAM_CLASSROOM.get(self.__team_id)
-        if course_id is not None:
-            answer = retrieve_parse_works(how_many=how_many,
-                                          course_id=course_id)
-        else:
-            answer = self.standard_answers["no_classroom"]
+            course_id = ASSOCIATIONS_TEAM_CLASSROOM.get(self.__team_id)
+            if course_id is not None:
+                answer = retrieve_parse_works(how_many=how_many,
+                                              course_id=course_id)
+            else:
+                answer = self.standard_answers["no_classroom"]
         return answer
 
 
@@ -167,6 +178,7 @@ class SessionResponse(Response):
     def answer(self):
         print("Reply.__format_answer_session received self.__sender_user_id",
               self.__sender_user_id, type(self.__sender_user_id))
+
         sender_info = get_user_by_id(self.__sender_user_id)
         is_admin = self.__is_role_admin(sender_info)
         username = self.__get_user_name_from_info(sender_info)
@@ -178,17 +190,11 @@ class SessionResponse(Response):
                     user_asked_about)
 
                 sessions = get_user_sessions_from_api(user_id_asked_about)
-                print('\n#############################\n')
-                print("\nsessions_received\n")
-                print("I received {} sessions".format(len(sessions)))
-                pprint(sessions)
-                print('\n#############################\n')
                 answer = self.__format_session_from_api(sessions,
                                                         user_asked_about)
                 if answer == "":
                     answer = self.standard_answers['invalid_user']
             except Exception as e:
-                print('\n#############################\n')
                 print("\nException raised while asking sessions\n")
                 print(repr(e))
                 answer = self.standard_answers['invalid_user']
@@ -235,3 +241,27 @@ class SessionResponse(Response):
         if roles is not None and 'system_admin' in roles:
             return True
         return False
+
+
+class ClearResponse(Response):
+    def __init__(self, channel_id, sender_user_id):
+        self.__channel_id = channel_id
+        self.__sender_user_id = sender_user_id
+        pass
+
+    def answer(self):
+        sender_info = get_user_by_id(self.__sender_user_id)
+        if self.__is_role_admin(sender_info):
+            self.__clear_channel()
+        else:
+            return self.standard_answers["cannot_do"]
+
+    def __is_role_admin(self, sender_info):
+        roles = sender_info.get('roles')
+        if roles is not None and 'system_admin' in roles:
+            return True
+            return False
+
+    def __clear_channel(self):
+        channel_post_ids = get_post_for_channel(self.__channel_id)
+        delete_posts_from_list_id(channel_post_ids)

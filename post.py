@@ -1,11 +1,20 @@
-from constants import VERBOSE, START_LATEX
-from constants import START_COMMAND, END_LATEX
-from pprint import pprint
 import json
+from pprint import pprint
+
+from constants import VERBOSE
+from constants import START_COMMAND
+from constants import START_LATEX
+from constants import END_LATEX
+from constants import PATH_ID_BOT
+
+from utils import read_from_file
+
 from reply import Reply
 
 
 class Post:
+    __bot_id = read_from_file(PATH_ID_BOT)
+
     def __init__(self, msg_json_data_post, team_id):
         self.__msg_json_data_post = msg_json_data_post
         self.__team_id = team_id
@@ -15,13 +24,15 @@ class Post:
 
     @classmethod
     def from_json(cls, msg_json):
-        if 'data' in msg_json and 'post' in msg_json['data']:
-            msg_json_data_post = msg_json['data']['post']
-            team_id = msg_json['data'].get('team_id')
-            if VERBOSE:
-                print('classmethod : Post from_json')
-                pprint(msg_json_data_post)
-            return Post(msg_json_data_post, team_id)
+        if 'event' in msg_json and msg_json['event'] == 'posted':
+            if 'data' in msg_json and 'post' in msg_json['data']:
+                msg_json_data_post = msg_json['data']['post']
+                team_id = msg_json['data'].get('team_id')
+
+                if VERBOSE:
+                    print('classmethod : Post from_json')
+                    pprint(msg_json_data_post)
+                return Post(msg_json_data_post, team_id)
 
     def parse_post(self):
         '''
@@ -37,10 +48,14 @@ class Post:
             channel_id = message.get("channel_id")
             message_content = message.get('message')
             senders_user_id = message.get('user_id')
-            if senders_user_id is not None:
-                print("\nsenders_user_id", senders_user_id, '\n')
-                print(type(senders_user_id))
-                self.__sender_user_id = senders_user_id
+            self.__sender_user_id = senders_user_id
+
+            if self.__sender_user_id == self.__bot_id:
+                if VERBOSE:
+                    print("\n###################\n")
+                    print("OWN MESSAGE READ, SKIP")
+                    return
+
             if VERBOSE:
                 print("message_content", message_content)
                 print("team_id", self.__team_id)

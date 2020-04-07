@@ -5,7 +5,14 @@ from pprint import pprint
 # own
 
 from constants import VERBOSE
+from constants import PATH_ID_BOT
+
 from mattermost_api import create_driver
+from mattermost_api import driver_create_login_get_info
+
+from utils import write_to_file
+from utils import read_from_file
+
 from post import Post
 
 
@@ -57,11 +64,19 @@ def robert_le_robot(verbose=False):
         print("Launching robert_le_robot.py")
         print("\n##############################################\n")
         print("create_driver")
-    driver = create_driver()
+    driver, bot_id, bot_username = driver_create_login_get_info()
+    saved_bot_id = read_from_file(PATH_ID_BOT)
+    if VERBOSE:
+        print("received id", bot_id)
+        print("saved id", saved_bot_id)
+    if saved_bot_id != bot_id:
+        if VERBOSE:
+            print("saved id doesn't match")
+        write_to_file(PATH_ID_BOT, bot_id)
+
     if VERBOSE:
         print("\n##############################################\n")
         print("login")
-    driver.login()
     if VERBOSE:
         print("\n###############################################\n")
         print("start async message_handler")

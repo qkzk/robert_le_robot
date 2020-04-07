@@ -17,3 +17,13 @@ def read_yaml_file(path):
 def get_standard_answers():
     standard_answers = read_yaml_file(PATH_STANDARD_ANSWERS)
     return standard_answers
+
+
+def write_to_file(path, content):
+    with open(path, 'w') as f:
+        f.write(content)
+
+
+def read_from_file(path):
+    with open(path, 'r') as f:
+        return f.read()

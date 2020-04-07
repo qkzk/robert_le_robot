@@ -23,6 +23,7 @@ from responses import ClassroomResponse
 from responses import PythonResponse
 from responses import LatexResponse
 from responses import SessionResponse
+from responses import ClearResponse
 
 
 class Reply:
@@ -50,7 +51,11 @@ class Reply:
             if VERBOSE:
                 print("\nmsg_options")
                 pprint(self.__msg_options)
-            self.__send_reply()
+            if self.__msg_options.get('message') is not None:
+                self.__send_reply()
+            else:
+                if VERBOSE:
+                    print("\nbot_replies : answer is None. Nothing sent.")
 
     def __send_reply(self):
         self.__driver = create_driver()
@@ -86,6 +91,10 @@ class Reply:
         elif self.__command.startswith("session"):
             self.__response = SessionResponse(self.__command,
                                               self.__sender_user_id)
+
+        elif self.__command in ['nettoyer', 'clear', 'clean']:
+            self.__response = ClearResponse(self.__channel_id,
+                                            self.__sender_user_id)
 
         else:
             self.__response = CannotdoResponse()
