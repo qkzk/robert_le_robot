@@ -40,25 +40,29 @@ from sympy.parsing.latex import parse_latex
 from classroom_api import retrieve_parse_works
 from constants import PATH_ANSWER_HELP, DATETIME_FORMAT
 from constants import VERBOSE, PATH_TEAM_CLASSROOM
-from get_format_sessions import get_format_sessions
 from mattermost_api import create_driver
 from mattermost_api import get_team_from_channel
+from mattermost_api import get_user_by_id
+from mattermost_api import get_user
+from mattermost_api import get_user_sessions_from_api
 from utils import get_standard_answers, read_yaml_file
 
 ASSOCIATIONS_TEAM_CLASSROOM = read_yaml_file(PATH_TEAM_CLASSROOM)
+FORMAT_SESSION_DATE = "le %Y-%m-%d à %H:%M"
 
 
 class Reply:
     def __init__(self,
                  command,
                  latex_syntax=False,
+                 sender_user_id=None,
                  channel_id=None,
                  team_id=None):
         self.__command = command
         self.__latex_syntax = latex_syntax
         self.__channel_id = channel_id
         self.__team_id = team_id
-
+        self.__sender_user_id = sender_user_id
         self.__driver = None
         self.__msg_options = None
         self.__standard_answers = get_standard_answers()
@@ -202,15 +206,75 @@ class Reply:
         return answer
 
     def __format_answer_session(self):
-        user_asked_about = self.__command.split("session")[1].strip()
-        try:
-            answer = get_format_sessions(user_asked_about)
-            if answer == "":
+        print("Reply.__format_answer_session received self.__sender_user_id",
+              self.__sender_user_id, type(self.__sender_user_id))
+        sender_info = get_user_by_id(self.__sender_user_id)
+        is_admin = self.__is_role_admin(sender_info)
+        username = self.__get_user_name_from_info(sender_info)
+
+        if is_admin:
+            user_asked_about = self.__command.split("session")[1].strip()
+            try:
+                user_id_asked_about = self.__get_user_id_from_username(
+                    user_asked_about)
+
+                sessions = get_user_sessions_from_api(user_id_asked_about)
+                # print('\n#############################\n')
+                # print("\nsessions_received\n")
+                # pprint(sessions)
+                # print('\n#############################\n')
+                answer = self.__format_session_from_api(sessions,
+                                                        user_asked_about)
+                if answer == "":
+                    answer = self.__standard_answers['invalid_user']
+            except Exception as e:
+                print('\n#############################\n')
+                print("\nException raised while asking sessions\n")
+                print(repr(e))
                 answer = self.__standard_answers['invalid_user']
-        except Exception as e:
-            print(repr(e))
-            answer = self.__standard_answers['invalid_user']
+        else:
+            if VERBOSE:
+                print("user {0} - {1} session. Permission denied".format(
+                    username,
+                    self.__sender_user_id
+                ))
+            answer = self.__standard_answers['cannot_do']
         return answer
+
+    def __format_session_from_api(self, sessions, username):
+        answer = ''
+        for session in sessions:
+            answer += self.__format_session_text(answer, session, username)
+        return answer
+
+    def __format_session_text(self, answer, session, username):
+        create_at = datetime.fromtimestamp(session.get('create_at') // 1000)
+        last_activity_at = datetime.fromtimestamp(
+            session.get('last_activity_at') // 1000)
+
+        answer += 'Connexion de {} '.format(username)
+        answer += datetime.strftime(create_at, FORMAT_SESSION_DATE)
+        answer += ' jusque '
+        answer += datetime.strftime(last_activity_at, FORMAT_SESSION_DATE)
+        answer += '\n'
+        return answer
+
+    def __get_user_id_from_username(self, username):
+        user_data = get_user(username)
+        return user_data.get("id")
+
+    def __username_from_user_id(self, user_id):
+        user_data = get_user_by_id(user_id)
+        return user_data.get("username")
+
+    def __get_user_name_from_info(self, sender_info):
+        return sender_info.get('username')
+
+    def __is_role_admin(self, sender_info):
+        roles = sender_info.get('roles')
+        if roles is not None and 'system_admin' in roles:
+            return True
+        return False
 
     def __format_answer_cannot_do(self):
         return self.__standard_answers["cannot_do"]

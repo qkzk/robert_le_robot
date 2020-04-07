@@ -45,6 +45,7 @@ def message_handler(message):
         print("\nmessage_content")
         pprint(msg_json)
         print("\n###############################################\n")
+        # exit()
     post_obj = Post.from_json(msg_json)
     if post_obj is not None:
         post_obj.parse_post()

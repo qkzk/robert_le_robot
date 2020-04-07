@@ -46,9 +46,25 @@ def get_user(username, driver=None):
         print(f"\nget user {username}")
     if driver is None:
         driver = create_driver()
+    driver.login()
     user = driver.users.get_user_by_username(username)
     if VERBOSE:
         print(f"\nuser {username} is")
+        print(user)
+    return user
+
+
+def get_user_by_id(user_id, driver=None):
+    '''Retourne les infos d'un utilisateur par son user_id'''
+    assert type(user_id) == str, "get_user_id: user id is not a string"
+    if VERBOSE:
+        print(f"\nget user {user_id}")
+    if driver is None:
+        driver = create_driver()
+    driver.login()
+    user = driver.users.get_user(user_id)
+    if VERBOSE:
+        print(f"\nuser {user_id} is")
         print(user)
     return user
 
@@ -57,10 +73,10 @@ def get_channel_info_from_channel_id(channel_id, driver=None):
     if driver is None:
         driver = create_driver()
     driver.login()
-    mattermost_answer = driver.channels.get_channel(channel_id)
+    channel_info = driver.channels.get_channel(channel_id)
     if VERBOSE:
-        pprint(mattermost_answer)
-    return mattermost_answer
+        pprint(channel_info)
+    return channel_info
 
 
 def get_team_from_channel(channel_id, driver=None):
@@ -68,3 +84,23 @@ def get_team_from_channel(channel_id, driver=None):
                                                          driver=driver)
     team_id = mattermost_answer.get('team_id')
     return team_id
+
+
+def get_user_sessions_from_api(user_id, driver=None):
+    if driver is None:
+        driver = create_driver()
+    driver.login()
+    sessions = driver.users.get_user_sessions(user_id)
+    if VERBOSE:
+        pprint(sessions)
+    return sessions
+
+
+def get_user_audits_from_api(user_id, driver=None):
+    if driver is None:
+        driver = create_driver()
+    driver.login()
+    audits = driver.users.get_user_audits(user_id)
+    if VERBOSE:
+        pprint(audits)
+    return audits
