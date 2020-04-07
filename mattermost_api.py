@@ -148,7 +148,19 @@ def driver_create_login_get_info():
     return driver, bot_id, bot_username
 
 
-def get_posts_from_user(username):
-    _, __, driver = create_driver_and_login()  # TODO attention signature
-    # revoke all acive sessions /users/{user_id}/sessions/revoke/all
-    # Deactivate a user account./users/{user_id}
+def get_teams_id():
+    driver = create_driver_and_login()
+    teams = driver.teams.get_teams()
+    return [team.get('id') for team in teams]
+
+
+def get_all_posts_from_username(username):
+    '''à editer, il faut encore retrouver les teams_id'''
+    teams_id = get_teams_id()
+    posts = []
+    driver = create_driver_and_login()
+    for team_id in teams_id:
+        posts += driver.posts.search_for_team_posts(
+            team_id,
+            options={'terms': 'from:{}'.format(username)}).get('order')
+    return posts

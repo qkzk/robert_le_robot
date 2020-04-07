@@ -18,7 +18,7 @@ from mattermost_api import get_user
 from mattermost_api import get_user_sessions_from_api
 from mattermost_api import get_post_for_channel
 from mattermost_api import delete_posts_from_list_id
-from mattermost_api import get_posts_from_user
+from mattermost_api import get_all_posts_from_username
 
 
 ASSOCIATIONS_TEAM_CLASSROOM = read_yaml_file(PATH_TEAM_CLASSROOM)
@@ -269,18 +269,28 @@ class ClearResponse(Response):
 
 
 class DeteleResponse(Response):
-    def __init__(self, command, channel_id, sender_user_id):
+    def __init__(self, command, sender_user_id):
         self.__command = command
-        self.__channel_id = channel_id
         self.__sender_user_id = sender_user_id
-        pass
 
     def answer(self):
         sender_info = get_user_by_id(self.__sender_user_id)
         if self.__is_role_admin(sender_info):
-            self.__clear_channel()
+            self.__delete_messages()
         else:
             return self.standard_answers["cannot_do"]
+
+    def __delete_messages(self):
+        username_mentioned = self.__command.split('delete')[1].strip()
+        if username_mentioned != '':
+            try:
+                posts_from_username = get_all_posts_from_username(
+                    username_mentioned)
+                delete_posts_from_list_id(posts_from_username)
+            except Exception as e:
+                if VERBOSE:
+                    print("__delete_messages")
+                    print(repr(e))
 
     def __is_role_admin(self, sender_info):
         # TODO duplicate
@@ -293,9 +303,3 @@ class DeteleResponse(Response):
         # TODO duplicate
         user_data = get_user(username)
         return user_data.get("id")
-
-    def __clear_channel(self):
-        self.__command.
-        channel_post_ids = get_posts_from_user(user_mentioned)
-
-        delete_posts_from_list_id(channel_post_ids)

@@ -24,6 +24,7 @@ from responses import PythonResponse
 from responses import LatexResponse
 from responses import SessionResponse
 from responses import ClearResponse
+from responses import DeteleResponse
 
 
 class Reply:
@@ -96,10 +97,9 @@ class Reply:
             self.__response = ClearResponse(self.__channel_id,
                                             self.__sender_user_id)
 
-        elif self.__command in ['delete']:
-            self.__response = ClearResponse(self.__command,
-                                            self.__channel_id,
-                                            self.__sender_user_id)
+        elif self.__command.startswith('delete'):
+            self.__response = DeteleResponse(self.__command,
+                                             self.__sender_user_id)
 
         else:
             self.__response = CannotdoResponse()
