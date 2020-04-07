@@ -1,3 +1,7 @@
+'''
+Next step : POO
+'''
+
 from pprint import pprint
 
 from constants import VERBOSE

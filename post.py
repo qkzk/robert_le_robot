@@ -40,18 +40,7 @@ class Post:
             if senders_user_id is not None:
                 print("\nsenders_user_id", senders_user_id, '\n')
                 print(type(senders_user_id))
-                if type(senders_user_id) == str:
-                    self.__sender_user_id = senders_user_id
-                else:
-                    print('user_id is not a string')
-                    exit(1)
-                # if len(senders_user_id) > 0:
-                #     self.__sender_user_id = senders_user_id[0]
-                #     if len(senders_user_id) > 1:
-                #         if VERBOSE:
-                #             print('\nMultiple users :')
-                #             print(senders_user_id)
-                #             print()
+                self.__sender_user_id = senders_user_id
             if VERBOSE:
                 print("message_content", message_content)
                 print("team_id", self.__team_id)
