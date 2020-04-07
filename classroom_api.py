@@ -116,9 +116,9 @@ def get_courses(service=None, scopes=None,
                     })
     return my_courses
 
-
-def tester_tlm():
-    assert my_courses == get_courses()
+# 
+# def tester_tlm():
+#     assert my_courses == get_courses()
 
 
 def create_work(content=None, course_id=None):

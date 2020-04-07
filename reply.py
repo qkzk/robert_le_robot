@@ -48,10 +48,12 @@ from mattermost_api import get_user_sessions_from_api
 from utils import get_standard_answers, read_yaml_file
 
 ASSOCIATIONS_TEAM_CLASSROOM = read_yaml_file(PATH_TEAM_CLASSROOM)
-FORMAT_SESSION_DATE = "le %Y-%m-%d à %H:%M"
 
 
 class Reply:
+
+    FORMAT_SESSION_DATE = "le %Y-%m-%d à %H:%M"
+
     def __init__(self,
                  command,
                  latex_syntax=False,
@@ -253,9 +255,9 @@ class Reply:
             session.get('last_activity_at') // 1000)
 
         answer += 'Connexion de {} '.format(username)
-        answer += datetime.strftime(create_at, FORMAT_SESSION_DATE)
+        answer += datetime.strftime(create_at, self.FORMAT_SESSION_DATE)
         answer += ' jusque '
-        answer += datetime.strftime(last_activity_at, FORMAT_SESSION_DATE)
+        answer += datetime.strftime(last_activity_at, self.FORMAT_SESSION_DATE)
         answer += '\n'
         return answer
 
