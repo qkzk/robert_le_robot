@@ -1,26 +1,5 @@
 '''
-NEXT STEP
-
-1. passer aussi de quoi connaître le niveau d'authorisation d'un user
-2. refactorer :
-    Classe pour formattage standard :
-    après avoir reçu le mot clé, les parametres
-    Une classe par type de réponse
-
-    * PythonCommand
-    * LatexCommand
-    * DateCommand
-    * SessionCommand
-    * HelpCommand
-    * InvalidCommand
-
-
-
-1. lire une commnde avec une permission particulière
-2. vérifier le rôle de l'user
-    * si l'user a pas le bon rôle, pas répondre
-    * si l'user a le bon rôle, répondre via DM
-
+Next step : forcer la réponse à Session à un channel privé
 
 get the DM channel id
 
