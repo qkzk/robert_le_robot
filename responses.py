@@ -8,9 +8,9 @@ from sympy.parsing.latex import parse_latex
 from classroom_api import retrieve_parse_works
 from constants import VERBOSE
 from constants import DATETIME_FORMAT
-from constants import PATH_ANSWER_HELP
+# from constants import PATH_ANSWER_HELP
 from constants import PATH_TEAM_CLASSROOM
-from constants import PATH_ANSWER_HELP
+# from constants import PATH_ANSWER_HELP
 from utils import get_standard_answers, read_yaml_file
 
 from mattermost_api import get_user_by_id
@@ -59,8 +59,9 @@ class HelpResponse(Response):
         super(HelpResponse, self).__init__(parameters)
 
     def answer(self):
-        with open(PATH_ANSWER_HELP) as f:
-            return f.read()
+        return self.standard_answers["help"]
+        # with open(PATH_ANSWER_HELP) as f:
+        #     return f.read()
 
 
 class ClassroomResponse(Response):

@@ -5,7 +5,6 @@ from pprint import pprint
 # own
 
 from constants import VERBOSE
-from constants import PATH_ID_BOT
 
 from mattermost_api import create_driver
 from mattermost_api import driver_create_login_get_info
@@ -43,19 +42,19 @@ A l'heure actuelle il peut :
 
 class Robert:
     def __init__(self):
-        self.__driver, bot_id, bot_username = driver_create_login_get_info()
+        self.__driver, self.__id, self.__username = driver_create_login_get_info()
         self.__state = {}
-        saved_bot_id = read_from_file(PATH_ID_BOT)
-        if VERBOSE:
-            print("saved id", saved_bot_id)
-            print("received id", bot_id)
-            print("saved id doesn't match, updating")
-        write_to_file(PATH_ID_BOT, bot_id)
 
         if VERBOSE:
             print("\n###############################################\n")
             print("start async message_handler")
         self.__driver.init_websocket(self.__message_handler)
+
+    def id(self):
+        return self.__id
+
+    def username(self):
+        return self.__username
 
     def get_driver(self):
         return self.__driver

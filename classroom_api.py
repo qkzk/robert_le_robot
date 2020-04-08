@@ -19,16 +19,16 @@ import os.path
 from datetime import datetime
 from pprint import pprint
 
-# community
-import yaml
-
 # google
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
 # perso
-from classroom_courses import courses_name, my_courses
+from classroom_courses import courses_name
+from classroom_courses import my_courses
+from constants import PATH_STANDARD_ANSWERS
+from utils import get_standard_answers
 
 # If modifying these scopes, delete the file token.pickle.
 # SCOPES = ['https://www.googleapis.com/auth/classroom.courses.readonly']
@@ -38,7 +38,7 @@ from classroom_courses import courses_name, my_courses
 
 SCOPES = ['https://www.googleapis.com/auth/classroom.coursework.students']  # modifier les travaux
 
-PATH_TEMPLATE_FORMAT_CLASSROOM = './responses/template_format_classroom.md'
+# PATH_TEMPLATE_FORMAT_CLASSROOM = './responses/template_format_classroom.md'
 PATH_TOKEN_PICKLE = './config/token.pickle'
 PATH_CREDENTIALS = './config/credentials.json'
 
@@ -116,7 +116,7 @@ def get_courses(service=None, scopes=None,
                     })
     return my_courses
 
-# 
+#
 # def tester_tlm():
 #     assert my_courses == get_courses()
 
@@ -193,9 +193,10 @@ def parse_work_list(work_list, how_many=1, course_id=None):
 
 def get_modele():
     '''Récupère le modèle de présentation des travaux classroom'''
-    with open(PATH_TEMPLATE_FORMAT_CLASSROOM) as f:
-        content = f.read().strip()
-    return content
+    # with open(PATH_TEMPLATE_FORMAT_CLASSROOM) as f:
+    #     content = f.read().strip()
+    # return content
+    return get_standard_answers()['travail']
 
 
 def format_work_mattermost(work_simplified=None):

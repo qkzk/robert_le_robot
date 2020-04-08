@@ -5,7 +5,6 @@ from constants import VERBOSE
 from constants import START_COMMAND
 from constants import START_LATEX
 from constants import END_LATEX
-from constants import PATH_ID_BOT
 
 from utils import read_from_file
 
@@ -13,7 +12,7 @@ from reply import Reply
 
 
 class Post:
-    __bot_id = read_from_file(PATH_ID_BOT)
+    # __bot_id = read_from_file(PATH_ID_BOT)
 
     def __init__(self, bot, direct_order, msg_json_data_post, team_id):
         self.__bot = bot
@@ -54,7 +53,7 @@ class Post:
             senders_user_id = message.get('user_id')
             self.__sender_user_id = senders_user_id
 
-            if self.__sender_user_id == self.__bot_id:
+            if self.__sender_user_id == self.__bot.id():
                 if VERBOSE:
                     print("\n###################\n")
                     print("OWN MESSAGE READED, SKIP")

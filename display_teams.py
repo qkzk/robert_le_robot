@@ -2,7 +2,7 @@
 afficher toutes les équipes d'un bot appartenant à un serveur
 '''
 import mattermostdriver
-from robert_le_robot import read_token, get_options, create_driver
+from mattermost_api import create_driver_and_login
 from pprint import pprint
 
 BOT_USERNAME = 'robert_le_robot'
@@ -14,8 +14,7 @@ def display_teams():
     '''
     affiche dans la console toutes les équipes Mattermost d'un bot
     '''
-    driver = create_driver()
-    driver.login()
+    driver = create_driver_and_login()
     bot_id = None
     try:
         mattermost_bot_user = driver.users.get_user_by_username(BOT_USERNAME)
