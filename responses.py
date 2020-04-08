@@ -303,3 +303,23 @@ class DeteleResponse(Response):
         # TODO duplicate
         user_data = get_user(username)
         return user_data.get("id")
+
+
+class ConfirmationResponse(Response):
+    def __init__(self, bot, user_id):
+        self.__bot = bot
+        self.__user_id = user_id
+
+    def answer(self):
+        self.__bot.await_confirmation(self.__user_id, "confirmation")
+        return "valider ? (!robert oui/ !robert non)"
+
+
+class ExecuteConfirmation(Response):
+    def __init__(self, bot, user_id):
+        self.__bot = bot
+        self.__user_id = user_id
+
+    def answer(self):
+        self.__bot.delete_state_for_user(self.__user_id)
+        return "confirmée !"

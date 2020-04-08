@@ -4,11 +4,11 @@ Next step : forcer la réponse à Session à un channel privé
 get the DM channel id
 
 func GetDMNameFromIds(userId1, userId2 string) string {
-	if userId1 > userId2 {
-		return userId2 + "__" + userId1
-	} else {
-		return userId1 + "__" + userId2
-	}
+    if userId1 > userId2 {
+        return userId2 + "__" + userId1
+    } else {
+        return userId1 + "__" + userId2
+    }
 '''
 from pprint import pprint
 
@@ -25,15 +25,20 @@ from responses import LatexResponse
 from responses import SessionResponse
 from responses import ClearResponse
 from responses import DeteleResponse
+from responses import ConfirmationResponse
+from responses import ExecuteConfirmation
 
 
 class Reply:
     def __init__(self,
+                 bot,
                  command,
                  latex_syntax=False,
                  sender_user_id=None,
                  channel_id=None,
                  team_id=None):
+
+        self.__bot = bot
         self.__command = command
         self.__latex_syntax = latex_syntax
         self.__channel_id = channel_id
@@ -100,6 +105,18 @@ class Reply:
         elif self.__command.startswith('delete'):
             self.__response = DeteleResponse(self.__command,
                                              self.__sender_user_id)
+
+        elif self.__command.startswith('attendre'):
+            self.__response = ConfirmationResponse(self.__bot,
+                                                   self.__sender_user_id)
+
+        elif self.__command in ('confirmer'):
+            if self.__bot.get_state_for_user(self.__sender_user_id) is not None:
+                self.__response = ExecuteConfirmation(self.__bot,
+                                                      self.__sender_user_id)
+            else:
+                print("NO STATE FOR USER", self.__sender_user_id)
+                self.__response = CannotdoResponse()
 
         else:
             self.__response = CannotdoResponse()
