@@ -160,3 +160,50 @@ def get_all_posts_from_username(username):
             team_id,
             options={'terms': 'from:{}'.format(username)}).get('order')
     return posts
+
+
+def add_user_to_team(team_id, user_id):
+    driver, bot_id, bot_username = driver_create_login_get_info()
+    options = {
+        "team_id": team_id,
+        "user_id": bot_id
+    }
+    result = driver.teams.add_user_to_team(team_id, options=options)
+    driver.logout()
+    return result
+
+
+def add_bot_to_list_teams(team_ids):
+    driver, bot_id, bot_username = driver_create_login_get_info()
+    driver.logout()
+    for team_id in team_ids:
+        add_user_to_team(team_id, bot_id)
+
+
+def add_bot_to_all_teams():
+    team_ids = get_teams_id()
+    add_bot_to_list_teams(team_ids)
+
+
+def get_all_channels():
+    driver = create_driver_and_login()
+    team_ids = get_teams_id()
+    channel_list = []
+    for team_id in team_ids:
+        channel_list += driver.teams.get_public_channels(team_id)
+    return [
+        channel.get('id')
+        for channel in channel_list
+        if channel.get('id') is not None
+    ]
+
+
+def add_bot_all_channels():
+    driver, bot_id, bot_username = driver_create_login_get_info()
+
+    channel_ids = get_all_channels()
+    for channel_id in channel_ids:
+        options = {
+            "user_id": bot_id,
+        }
+        driver.channels.add_user(channel_id, options=options)

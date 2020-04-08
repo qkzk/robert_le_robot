@@ -1,0 +1,3 @@
+basepath: /api/v4
+debug: falseport: 443
+url: example.com

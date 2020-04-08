@@ -11,24 +11,7 @@
 ## Présentation
 
 **Robert le robot** est un bot en python pour [Mattermost](https://mattermost.org).
-Une fois la configuration effectuée (à la main !) il peut répondre à différentes commandes.
-
-Librairies :
-
-* [mattermostdriver](https://github.com/Vaelor/python-mattermost-driver) permet de contrôler le bot et de créer des webhooks
-* [pyaml](https://pypi.org/project/PyYAML/) pour lire les fichiers de configuration
-* [google classroom](https://developers.google.com/classroom/quickstart/python)
-* [sympy](https://www.sympy.org/en/index.html) pour évaluer les commandes latex. Ce parser nécessite aussi [antlr4-python3-runtime](https://pypi.org/project/antlr4-python3-runtime/)
-
-## Créer un bot pour mattermost
-
-L'aide de Mattermost [ici](https://docs.mattermost.com/developer/bot-accounts.html)  et [là](https://docs.mattermost.com/developer/bot-accounts.html#bot-account-creation) explique comment créer un bot.
-
-Il faut d'abord autoriser la création de bots ainsi que [celles de webhook](https://docs.mattermost.com/developer/webhooks-outgoing.html),
-qui permettent au bot de lire les messages d'un canal.
-
-**Robert** répond à la fois aux messages privés et aux messages publics sur un canal.
-
+Il peut répondre à différentes commandes.
 
 ## Superpouvoirs de Robert
 
@@ -48,9 +31,25 @@ Il reconnait aussi la syntaxe latex :
 
 \`\`\`
 
+
+## Librairies :
+
+* [mattermostdriver](https://github.com/Vaelor/python-mattermost-driver) permet de contrôler le bot et de créer des webhooks
+* [pyaml](https://pypi.org/project/PyYAML/) pour lire les fichiers de configuration
+* [google classroom](https://developers.google.com/classroom/quickstart/python)
+* [sympy](https://www.sympy.org/en/index.html) pour évaluer les commandes latex. Ce parser nécessite aussi [antlr4-python3-runtime](https://pypi.org/project/antlr4-python3-runtime/)
+
+
+## Créer un bot pour mattermost
+
+L'aide de Mattermost [ici](https://docs.mattermost.com/developer/bot-accounts.html)  et [là](https://docs.mattermost.com/developer/bot-accounts.html#bot-account-creation) explique comment créer un bot.
+
+Il faut d'abord autoriser la création de bots ainsi que [celles de webhook](https://docs.mattermost.com/developer/webhooks-outgoing.html),
+qui permettent au bot de lire les messages d'un canal.
+
+**Robert** répond à la fois aux messages privés et aux messages publics sur un canal.
+
 ## Configurer robert
-
-
 
 Pour l'instant c'est un processus fastidieux. L'un des objectifs est d'automatiser au maximum cette démarche.
 
@@ -61,7 +60,7 @@ Les étapes suivantes permettent d'utiliser l'API de google classroom.
 1. **Token** Robert est un bot, Mattermost permet aux bot de s'identifier directment par un token, sans utiliser d'email.
 
     1. **Créer un compte de bot** directement dans la console système de votre serveur. **Copier le token**.
-    2. **Écriver le token** dans [token.robert](./config/token.robert)
+    2. **Écrire le token** dans [token.robert](./config/token.robert)
     3. **AJOUTER ROBERT AUX TEAMS**. Si le bot n'est pas dans une équipe, il ne pourra y poster. Cela se fait directement sur le serveur.
     4. **Copier le nom d'utilisateur** que vous avez donné à Robert.
 
