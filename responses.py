@@ -283,7 +283,7 @@ class DeteleResponse(Response):
 
     def __delete_messages(self):
 
-        print("\ndelete messages")
+        # print("\ndelete messages")
         # print(self.command)
         # username_mentioned = self.command.split('delete')[1].strip()
 
@@ -337,7 +337,7 @@ class AskConfirmationResponse(Response):
     def reply(self):
         sender_info = get_user_by_id(self.sender_user_id)
         if self.__is_role_admin(sender_info):
-            self.bot.await_confirmation(
+            self.bot.set_state_for_user(
                 self.sender_user_id,
                 (self.channel_id, self.command))
         return self.answer()

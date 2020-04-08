@@ -72,11 +72,7 @@ class Robert:
     def set_state_for_user(self, user_id, state):
         self.__state[user_id] = state
 
-    def await_confirmation(self, user_id, command):
-        self.__state[user_id] = command
-
     def delete_state_for_user(self, user_id):
-        print("\nrobert_le_robot DELETE STATE ASKED FOR {}\n".format(user_id))
         if user_id in self.__state:
             del self.__state[user_id]
 
@@ -100,7 +96,6 @@ class Robert:
             print("\nmessage_content")
             pprint(msg_json)
             print("\n###############################################\n")
-            # exit()
         self.__post_obj = Post.from_json(self, msg_json)
         if self.__post_obj is not None:
             self.__post_obj.parse_post()

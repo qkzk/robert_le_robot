@@ -57,7 +57,7 @@ class Reply:
             'help': HelpResponse,
             'date': DateResponse,
             'python': PythonResponse,
-            'latex': LatexResponse,  # va faire foirer ```latex ... ```
+            'latex': LatexResponse,
             'session': SessionResponse,
             'clear': AskConfirmationResponse,
             'delete': AskConfirmationResponse,
@@ -108,7 +108,13 @@ class Reply:
             if VERBOSE:
                 print("\n##############################################\n")
                 print("words", words)
-            self.__response_class = CannotdoResponse
+            if self.__latex_syntax:
+                if VERBOSE:
+                    print("\n##############################################\n")
+                    print("Latex Syntax received")
+                self.__response_class = LatexResponse
+            else:
+                self.__response_class = CannotdoResponse
 
         self.__response = self.__response_class(self.__reply_parameters)
 

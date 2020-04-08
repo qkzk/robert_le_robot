@@ -57,7 +57,7 @@ class Post:
             if self.__sender_user_id == self.__bot_id:
                 if VERBOSE:
                     print("\n###################\n")
-                    print("OWN MESSAGE READ, SKIP")
+                    print("OWN MESSAGE READED, SKIP")
                     return
 
             if VERBOSE:
