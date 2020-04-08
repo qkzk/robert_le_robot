@@ -2,3 +2,4 @@
 'invalid_latex': '_Expression invalide_'
 'cannot_do': '_Je ne peux pas faire ça_'
 'invalid_user': '_Rien trouvé sur cet utilisateur._'
+'confirmer': '_Valider la commande_ **{}** _?_ (`!robert confirmer`)'

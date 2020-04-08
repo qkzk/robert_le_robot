@@ -25,8 +25,8 @@ from responses import LatexResponse
 from responses import SessionResponse
 from responses import ClearResponse
 from responses import DeteleResponse
-from responses import ConfirmationResponse
-from responses import ExecuteConfirmation
+from responses import AskConfirmationResponse
+from responses import ExecuteConfirmationResponse
 
 
 class Reply:
@@ -44,32 +44,54 @@ class Reply:
         self.__channel_id = channel_id
         self.__team_id = team_id
         self.__sender_user_id = sender_user_id
+
         self.__driver = None
-        self.__msg_options = None
+        self.__reply_parameters = None
+        self.__post_options = None
+
+        self.__keywords_reactions = self.__define_reactions()
+
+    def __define_reactions(self):
+        reactions = {
+            'travail': ClassroomResponse,
+            'help': HelpResponse,
+            'date': DateResponse,
+            'python': PythonResponse,
+            'latex': LatexResponse,  # va faire foirer ```latex ... ```
+            'session': SessionResponse,
+            'clear': AskConfirmationResponse,
+            'delete': AskConfirmationResponse,
+            'demander': AskConfirmationResponse,
+            'confirmer': ExecuteConfirmationResponse,
+        }
+        return reactions
 
     def bot_replies(self):
         if VERBOSE:
             print("\n##############################################\n")
             print("bot_replies")
         if self.__channel_id is not None:
-            self.__msg_options = self.__create_options()
+            self.__reply_parameters = self.__create_parameters()
+            self.__post_options = self.__create_options()
 
             if VERBOSE:
                 print("\nmsg_options")
-                pprint(self.__msg_options)
-            if self.__msg_options.get('message') is not None:
+                pprint(self.__post_options)
+            if self.__post_options.get('message') is not None:
                 self.__send_reply()
             else:
                 if VERBOSE:
                     print("\nbot_replies : answer is None. Nothing sent.")
 
-    def __send_reply(self):
-        self.__driver = create_driver()
-        self.__driver.login()
-        if VERBOSE:
-            print('\nReply send logged in')
-        self.__driver.posts.create_post(self.__msg_options)
-        self.__driver.logout()
+    def __create_parameters(self):
+        return {
+            "bot": self.__bot,
+            "command": self.__command,
+            "sender_user_id": self.__sender_user_id,
+            "channel_id": self.__channel_id,
+            "team_id": self.__team_id,
+            "latex_syntax": self.__latex_syntax,
+        }
 
     def __create_options(self):
         '''choisit la bonne réaction et construit la réponse du bot'''
@@ -77,54 +99,28 @@ class Reply:
             print("\n##############################################\n")
             print("bot_command_options received", self.__command)
 
-        if 'travail' in self.__command:
-            self.__response = ClassroomResponse(self.__command,
-                                                self.__team_id,
-                                                self.__channel_id)
+        words = self.__command.split(' ')
 
-        elif self.__command in ['help', 'aide']:
-            self.__response = HelpResponse()
+        keyword = words[0].lower()
+        self.__response_class = self.__keywords_reactions.get(keyword)
 
-        elif self.__command in ["heure", "date", "aujourd'hui"]:
-            self.__response = DateResponse()
+        if self.__response_class is None:
+            if VERBOSE:
+                print("\n##############################################\n")
+                print("words", words)
+            self.__response_class = CannotdoResponse
 
-        elif self.__command.startswith("python"):
-            self.__response = PythonResponse(self.__command)
+        self.__response = self.__response_class(self.__reply_parameters)
 
-        elif self.__command.startswith("latex") or self.__latex_syntax:
-            self.__response = LatexResponse(self.__command, self.__latex_syntax)
-
-        elif self.__command.startswith("session"):
-            self.__response = SessionResponse(self.__command,
-                                              self.__sender_user_id)
-
-        elif self.__command in ['nettoyer', 'clear', 'clean']:
-            self.__response = ClearResponse(self.__channel_id,
-                                            self.__sender_user_id)
-
-        elif self.__command.startswith('delete'):
-            self.__response = DeteleResponse(self.__command,
-                                             self.__sender_user_id)
-
-        elif self.__command.startswith('attendre'):
-            self.__response = ConfirmationResponse(self.__bot,
-                                                   self.__sender_user_id)
-
-        elif self.__command in ('confirmer'):
-            if self.__bot.get_state_for_user(self.__sender_user_id) is not None:
-                self.__response = ExecuteConfirmation(self.__bot,
-                                                      self.__sender_user_id)
-            else:
-                print("NO STATE FOR USER", self.__sender_user_id)
-                self.__response = CannotdoResponse()
-
-        else:
-            self.__response = CannotdoResponse()
-
-        answer = self.__response.answer()
-
-        options = {
+        return {
             'channel_id': self.__channel_id,
-            'message': answer,
+            'message': self.__response.reply(),
         }
-        return options
+
+    def __send_reply(self):
+        self.__driver = create_driver()
+        self.__driver.login()
+        if VERBOSE:
+            print('\nReply send logged in')
+        self.__driver.posts.create_post(self.__post_options)
+        self.__driver.logout()

@@ -16,7 +16,6 @@ from utils import get_standard_answers, read_yaml_file
 from mattermost_api import get_user_by_id
 from mattermost_api import get_user
 from mattermost_api import get_user_sessions_from_api
-from mattermost_api import get_team_from_channel
 from mattermost_api import get_post_for_channel
 from mattermost_api import delete_posts_from_list_id
 from mattermost_api import get_all_posts_from_username
@@ -28,35 +27,24 @@ ASSOCIATIONS_TEAM_CLASSROOM = read_yaml_file(PATH_TEAM_CLASSROOM)
 class Response:
     standard_answers = get_standard_answers()
 
-    def __init__(self, parameters):
-        self.parameters = parameters
-        self.bot = parameters["bot"]
-        self.command = parameters["command"]
-        self.sender_user_id = parameters["sender_user_id"]
-        self.channel_id = parameters["channel_id"]
-        self.team_id = parameters["team_id"]
-        self.latex_syntax = parameters["latex_syntax"]
+    def __init__(self):
+        pass
 
     def answer(self):
         return ''
 
-    def reply(self):
-        answer = self.answer()
-        self.bot.delete_state_for_user(self.sender_user_id)
-        return answer
-
 
 class CannotdoResponse(Response):
-    def __init__(self, parameters):
-        super(CannotdoResponse, self).__init__(parameters)
+    def __init__(self):
+        pass
 
     def answer(self):
         return self.standard_answers["cannot_do"]
 
 
 class HelpResponse(Response):
-    def __init__(self, parameters):
-        super(HelpResponse, self).__init__(parameters)
+    def __init__(self):
+        pass
 
     def answer(self):
         with open(PATH_ANSWER_HELP) as f:
@@ -64,15 +52,18 @@ class HelpResponse(Response):
 
 
 class ClassroomResponse(Response):
-    def __init__(self, parameters):
-        super(ClassroomResponse, self).__init__(parameters)
+    def __init__(self, command, team_id, channel_id):
+        super(Response, self).__init__()
+        self.__command = command
+        self.__team_id = team_id
+        self.__channel_id = channel_id
 
     def answer(self):
         if VERBOSE:
             print('command : travail !')
 
         try:
-            last_param = self.command.split(' ')[-1]
+            last_param = self.__command.split(' ')[-1]
             print("last_param")
             print(last_param)
             can_continue = True
@@ -90,12 +81,12 @@ class ClassroomResponse(Response):
             if VERBOSE:
                 print(how_many)
 
-            print("team_id", self.team_id)
+            print("team_id", self.__team_id)
 
-            if self.team_id is None or self.team_id == '':
-                self.team_id = get_team_from_channel(self.channel_id)
+            if self.__team_id is None or self.__team_id == '':
+                self.__team_id = get_team_from_channel(self.__channel_id)
 
-            course_id = ASSOCIATIONS_TEAM_CLASSROOM.get(self.team_id)
+            course_id = ASSOCIATIONS_TEAM_CLASSROOM.get(self.__team_id)
             if course_id is not None:
                 answer = retrieve_parse_works(how_many=how_many,
                                               course_id=course_id)
@@ -105,8 +96,8 @@ class ClassroomResponse(Response):
 
 
 class DateResponse(Response):
-    def __init__(self, parameters):
-        super(DateResponse, self).__init__(parameters)
+    def __init__(self):
+        super(Response, self).__init__()
 
     def answer(self):
         '''
@@ -117,35 +108,38 @@ class DateResponse(Response):
 
 
 class PythonResponse(Response):
-    def __init__(self, parameters):
-        super(PythonResponse, self).__init__(parameters)
+    def __init__(self, command):
+        self.__command = command
+        super(Response, self).__init__()
 
     def answer(self):
         '''
         retourne l'aide d'un module python formattée
         https://stackoverflow.com/questions/15133537/pydoc-render-doc-adds-characters-how-to-avoid-that
         '''
-        help_seeked_on = self.command.split("python")[1].strip()
+        help_seeked_on = self.__command.split("python")[1].strip()
         if VERBOSE:
             print("help_seeked_on", help_seeked_on)
         try:
             answer = pydoc.render_doc(help_seeked_on,
                                       "Voici l'aide de **%s**",
-                                      renderer=pydoc.plaintext)[:16383]
+                                      renderer=pydoc.plaintext)
         except ImportError as e:
             answer = f"Il n'y a pas d'aide pour **{help_seeked_on}**"
         return answer
 
 
 class LatexResponse(Response):
-    def __init__(self, parameters):
-        super(LatexResponse, self).__init__(parameters)
+    def __init__(self, command, latex_syntax):
+        self.__command = command
+        self.__latex_syntax = latex_syntax
+        super(Response, self).__init__()
 
     def answer(self):
-        if not self.latex_syntax:
-            latex_command = self.command.split("latex")[1].strip()
+        if not self.__latex_syntax:
+            latex_command = self.__command.split("latex")[1].strip()
         else:
-            latex_command = self.command
+            latex_command = self.__command
         try:
             answer = self.__latex_evaluate_command(latex_command)
         except Exception as e:
@@ -177,19 +171,21 @@ class SessionResponse(Response):
 
     FORMAT_SESSION_DATE = "le %Y-%m-%d à %H:%M"
 
-    def __init__(self, parameters):
-        super(SessionResponse, self).__init__(parameters)
+    def __init__(self, command, sender_user_id):
+        self.__command = command
+        self.__sender_user_id = sender_user_id
+        super(Response, self).__init__()
 
     def answer(self):
-        print("Reply.__format_answer_session received selfsender_user_id",
-              self.sender_user_id, type(self.sender_user_id))
+        print("Reply.__format_answer_session received self.__sender_user_id",
+              self.__sender_user_id, type(self.__sender_user_id))
 
-        sender_info = get_user_by_id(self.sender_user_id)
+        sender_info = get_user_by_id(self.__sender_user_id)
         is_admin = self.__is_role_admin(sender_info)
         username = self.__get_user_name_from_info(sender_info)
 
         if is_admin:
-            user_asked_about = self.command.split("session")[1].strip()
+            user_asked_about = self.__command.split("session")[1].strip()
             try:
                 user_id_asked_about = self.__get_user_id_from_username(
                     user_asked_about)
@@ -207,7 +203,7 @@ class SessionResponse(Response):
             if VERBOSE:
                 print("user {0} - {1} session. Permission denied".format(
                     username,
-                    self.sender_user_id
+                    self.__sender_user_id
                 ))
             answer = self.standard_answers['cannot_do']
         return answer
@@ -249,11 +245,13 @@ class SessionResponse(Response):
 
 
 class ClearResponse(Response):
-    def __init__(self, parameters):
-        super(ClearResponse, self).__init__(parameters)
+    def __init__(self, channel_id, sender_user_id):
+        self.__channel_id = channel_id
+        self.__sender_user_id = sender_user_id
+        pass
 
     def answer(self):
-        sender_info = get_user_by_id(self.sender_user_id)
+        sender_info = get_user_by_id(self.__sender_user_id)
         if self.__is_role_admin(sender_info):
             self.__clear_channel()
         else:
@@ -266,35 +264,24 @@ class ClearResponse(Response):
             return False
 
     def __clear_channel(self):
-        channel_post_ids = get_post_for_channel(self.channel_id)
+        channel_post_ids = get_post_for_channel(self.__channel_id)
         delete_posts_from_list_id(channel_post_ids)
 
 
 class DeteleResponse(Response):
-    def __init__(self, parameters):
-        super(DeteleResponse, self).__init__(parameters)
+    def __init__(self, command, sender_user_id):
+        self.__command = command
+        self.__sender_user_id = sender_user_id
 
     def answer(self):
-        sender_info = get_user_by_id(self.sender_user_id)
+        sender_info = get_user_by_id(self.__sender_user_id)
         if self.__is_role_admin(sender_info):
             self.__delete_messages()
         else:
             return self.standard_answers["cannot_do"]
 
     def __delete_messages(self):
-
-        print("\ndelete messages")
-        # print(self.command)
-        # username_mentioned = self.command.split('delete')[1].strip()
-
-        bot_status = self.bot.get_state_for_user(self.sender_user_id)
-        username_mentioned = ''
-        try:
-            username_mentioned = bot_status[1].split('delete')[1].strip()
-        except (ValueError, IndexError, AttributeError) as e:
-            print(repr(e))
-            print(bot_status)
-
+        username_mentioned = self.__command.split('delete')[1].strip()
         if username_mentioned != '':
             try:
                 posts_from_username = get_all_posts_from_username(
@@ -318,50 +305,21 @@ class DeteleResponse(Response):
         return user_data.get("id")
 
 
-class AskConfirmationResponse(Response):
-    def __init__(self, parameters):
-        super(AskConfirmationResponse, self).__init__(parameters)
-
-    def __is_role_admin(self, sender_info):
-        roles = sender_info.get('roles')
-        if roles is not None and 'system_admin' in roles:
-            return True
-            return False
+class ConfirmationResponse(Response):
+    def __init__(self, bot, user_id):
+        self.__bot = bot
+        self.__user_id = user_id
 
     def answer(self):
-        sender_info = get_user_by_id(self.sender_user_id)
-        if self.__is_role_admin(sender_info):
-            return self.standard_answers['confirmer'].format(self.command)
-        return self.standard_answers["cannot_do"]
-
-    def reply(self):
-        sender_info = get_user_by_id(self.sender_user_id)
-        if self.__is_role_admin(sender_info):
-            self.bot.await_confirmation(
-                self.sender_user_id,
-                (self.channel_id, self.command))
-        return self.answer()
+        self.__bot.await_confirmation(self.__user_id, "confirmation")
+        return "valider ? (!robert oui/ !robert non)"
 
 
-class ExecuteConfirmationResponse(Response):
-    reactions = {
-        'clear': ClearResponse,
-        'delete': DeteleResponse,
-    }
-
-    def __init__(self, parameters):
-        super(ExecuteConfirmationResponse, self).__init__(parameters)
+class ExecuteConfirmation(Response):
+    def __init__(self, bot, user_id):
+        self.__bot = bot
+        self.__user_id = user_id
 
     def answer(self):
-        bot_status = self.bot.get_state_for_user(self.sender_user_id)
-
-        answer = self.standard_answers["cannot_do"]
-        if bot_status is not None and len(bot_status) > 1:
-            asked_for_channel_id, asked_command = bot_status
-            if self.channel_id == asked_for_channel_id:
-                # trip parameter
-                asked_command = asked_command.split(' ')[0]
-                reaction_response_class = self.reactions.get(asked_command)
-                if reaction_response_class is not None:
-                    answer = reaction_response_class(self.parameters).answer()
-        return answer
+        self.__bot.delete_state_for_user(self.__user_id)
+        return "confirmée !"

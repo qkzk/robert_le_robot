@@ -76,6 +76,7 @@ class Robert:
         self.__state[user_id] = command
 
     def delete_state_for_user(self, user_id):
+        print("\nrobert_le_robot DELETE STATE ASKED FOR {}\n".format(user_id))
         if user_id in self.__state:
             del self.__state[user_id]
 

@@ -27,3 +27,7 @@ def write_to_file(path, content):
 def read_from_file(path):
     with open(path, 'r') as f:
         return f.read()
+
+
+def clean_string(string):
+    return ''.join(char for char in string if char.isalnum())
