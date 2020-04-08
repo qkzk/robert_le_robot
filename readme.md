@@ -19,16 +19,19 @@ Il peut répondre à différentes commandes.
 * [x] **`!robert help`** (ou **aide**) : affiche ce message d'**aide**,
 * [x] **`!robert date`** (ou **`heure`** ou **`aujourd'hui`**) : affiche **l'heure**,
 * [x] **`!robert python {nom_d_objet}`** : affiche l'aide d'un objet **python**,
-* [x] **`!robert latex {syntaxe latex}`** : tente d'évaluer une commande **latex**. J'arrondis la valeur après 4 décimales.
+* [x] **`!robert latex {syntaxe latex}`** : tente d'évaluer une commande **latex**. La valeur est arrondie après 4 décimales.
 * [x] **`!robert travail [nombre]`** (**`nombre`** est optionnel) : affiche une brève description des derniers travaux déposés sur classroom.
-* [ ] _`!robert assiduite \@personne`_ : affiche des infos sur le compte : dernière connexion etc. _PAS ENCORE DÉVELOPPÉ_.
+* [x] **`!robert session \@username`** : affiche des infos sur le compte : dernière connexion etc. (_System Admin Only_)
+* [x] **`!robert clear`** : efface tous les messages d'un canal. Demande une confirmation par `!robert confirmer` (_System Admin Only_)
+* [x] **`!robert delete @username`** : efface tous les messages d'un utilisateur sur les canaux publics auxquel il a accès. Demande une confirmation par `!robert confirmer` (_System Admin Only_)
+* [ ] d'autres idées... parmi lesquelles : exécuter un script python, "panic mode : révoquer toutes les sessions", nettoyer tous les posts ayant plus de tel age dans la bdd, rendre silencieux un utilisateur,
 
 Il reconnait aussi la syntaxe latex :
 
 \`\`\`latex
-
-{syntaxe latex}
-
+```latex
+\sum i={1}^{100} \frac{1}{2^i}
+```
 \`\`\`
 
 
@@ -51,7 +54,10 @@ qui permettent au bot de lire les messages d'un canal.
 
 ## Configurer robert
 
-Pour l'instant c'est un processus fastidieux. L'un des objectifs est d'automatiser au maximum cette démarche.
+Deux méthodes :
+
+1. **automatiquement** : exécuter le script [configure_robert.py](./configure_robert.py) et laissez-vous guider.
+2. **manuellement** : suivre une à une toutes les étapes suivantes.
 
 Les étapes 1 et 2 suffisent à utiliser les fonctions de base de Robert (sans classroom).
 Les étapes suivantes permettent d'utiliser l'API de google classroom.
