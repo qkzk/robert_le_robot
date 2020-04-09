@@ -15,6 +15,8 @@ from constants import VERBOSE
 
 from utils import get_standard_answers, read_yaml_file
 
+from mattermost_api import create_post
+from mattermost_api import add_reaction
 from mattermost_api import delete_posts_from_list_id
 from mattermost_api import delete_this_post
 from mattermost_api import get_all_posts_from_username
@@ -51,6 +53,9 @@ class Response:
         self.bot.logger.info("reply sent : {}".format(answer))
         self.bot.delete_state_for_user(self.sender_user_id)
         return answer
+
+    def followup(self, mattermost_answer):
+        pass
 
 
 class CannotdoResponse(Response):
@@ -382,3 +387,73 @@ class MuteResponse(Response):
         else:
             return self.standard_answers["mute_channel"].format(
                 self.duration // 60)
+
+
+class PollResponse(Response):
+    def __init__(self, parameters):
+        super(PollResponse, self).__init__(parameters)
+        self.poll_question = self.get_poll_options()[0]
+        self.poll_options = self.get_poll_options()[2::2]
+        self.number_options = len(self.poll_options)
+        self.emoji_numbers = {
+            0: 'zero',
+            1: 'one',
+            2: 'two',
+            3: 'three',
+            4: 'four',
+            5: 'five',
+            6: 'six',
+            7: 'seven',
+            8: 'eight',
+            9: 'nine',
+            10: 'ten',
+        }
+        self.can_create_poll = True
+
+    def get_poll_options(self):
+        question_options = self.command.split('poll')[1]
+        if VERBOSE:
+            print("\npoll question :")
+            pprint(question_options)
+        try:
+            poll_options = question_options.split('"')[1:]
+            if VERBOSE:
+                print("\npoll options :")
+                pprint(poll_options)
+            return poll_options
+        except Exception as e:
+            print(repr(e))
+            return ['']
+
+    def format_answers(self):
+        text = self.poll_question
+        for index, option in enumerate(self.poll_options):
+            text += '\n:' + self.emoji_numbers[index] + ': ' + option
+        return text
+
+    def answer(self):
+        if self.number_options > 11:
+            text = self.standard_answers['too_many_polls']
+            self.can_create_poll = False
+        else:
+            text = self.format_answers()
+        return text
+
+    def followup(self, mattermost_answer):
+
+        if VERBOSE:
+            print("\n ############### FOLLOWUP ###############\n")
+            print(mattermost_answer)
+            print("\n ############################## \n")
+        if self.can_create_poll:
+            post_id = mattermost_answer.get("id")
+            bot_id = self.bot.id()
+            for index in range(len(self.poll_options)):
+                add_reaction(
+                    {
+                        "user_id": bot_id,
+                        "post_id": post_id,
+                        "emoji_name": self.emoji_numbers[index],
+                        "create_at": 0
+                    }
+                )

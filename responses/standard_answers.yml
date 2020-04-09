@@ -9,6 +9,7 @@
 'session_start': 'Connexion de {0} '
 'session_end': ' jusque '
 'mute_off': _Le canal n'est plus silencieux_
+'too_many_polls': '_Trop de réponses possibles. Maximum 11_'
 'help': |
   Bonjour, mon nom est **Robert**.
 

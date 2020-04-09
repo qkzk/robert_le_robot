@@ -184,10 +184,24 @@ def get_ids_from_posts(posts):
     return posts_ids
 
 
+def create_post(options, driver=None):
+    if driver is None:
+        driver = driver_create()
+    driver.login()
+    mattermost_answer = driver.posts.create_post(options)
+    driver.logout()
+    return mattermost_answer
+
+
 def delete_posts_from_list_id(post_ids):
     driver = driver_create_login()
     for post_id in post_ids:
         driver.posts.delete_post(post_id)
+
+
+def add_reaction(options):
+    driver = driver_create_login()
+    driver.reactions.create_reaction(options=options)
 
 
 def delete_this_post(post_id):

@@ -15,8 +15,9 @@ from pprint import pprint
 
 from constants import VERBOSE
 
-from mattermost_api import create_driver
+from mattermost_api import driver_create
 
+from responses import Response
 from responses import DateResponse
 from responses import CannotdoResponse
 from responses import HelpResponse
@@ -30,6 +31,7 @@ from responses import AskConfirmationResponse
 from responses import ExecuteConfirmationResponse
 from responses import DeletePostResponse
 from responses import MuteResponse
+from responses import PollResponse
 
 
 class Reply:
@@ -57,6 +59,8 @@ class Reply:
         self.__post_options = None
 
         self.__keywords_reactions = self.__define_reactions()
+        self.__response = Response
+        self.__mattermost_answer = None
 
     def __define_reactions(self):
         reactions = {
@@ -72,6 +76,7 @@ class Reply:
             'confirmer': ExecuteConfirmationResponse,
             'delete_this_post': DeletePostResponse,
             'mute': MuteResponse,
+            'poll': PollResponse,
         }
         return reactions
 
@@ -87,7 +92,10 @@ class Reply:
                 print("\nmsg_options")
                 pprint(self.__post_options)
             if self.__post_options.get('message') is not None:
-                self.__send_reply()
+                self.__mattermost_answer = create_post(self.__post_options)
+                if VERBOSE:
+                    print('\nReply sent')
+                self.__response.followup(mattermost_answer)
             else:
                 if VERBOSE:
                     print("\nbot_replies : answer is None. Nothing sent.")
@@ -132,11 +140,3 @@ class Reply:
             'channel_id': self.__channel_id,
             'message': self.__response.reply(),
         }
-
-    def __send_reply(self):
-        self.__driver = driver_create()
-        self.__driver.login()
-        if VERBOSE:
-            print('\nReply send logged in')
-        self.__driver.posts.create_post(self.__post_options)
-        self.__driver.logout()

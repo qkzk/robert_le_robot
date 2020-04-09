@@ -100,14 +100,14 @@ class Robert:
             self.delete_state_for_user(user_id)
 
     def __default_channel_mode(id, channel_id):
-        return channel_id: {
+        return {
             "channel_id": channel_id,
             "muted": False,
         }
 
     def default_mode(self):
         return {
-            self.__default_channel_mode(channel_id)
+            channel_id: self.__default_channel_mode(channel_id)
             for channel_id in self.channel_ids
         }
 
