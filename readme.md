@@ -29,7 +29,7 @@ L'objectif de Robert est d'apporter un peu de facilité aux enseignants et aux
 * [x] **`!robert delete username`** : efface tous les messages d'un utilisateur sur les canaux publics auxquel il a accès. Demande une confirmation par `!robert confirmer` (_System Admin Only_)
 * [x] **`!robert session username`** : affiche toutes les sessions d'un utilisateur. (_System Admin Only_)
 * [x] **`!robert mute [durée/off]`** : empêche les utilisateurs de s'exprimer sur un canal. S'arrête après une durée par défaut. (_System Admin Only_)
-* [x] **`!robert poll "ce midi ?" "pizza" "kebab" "sushis"`** : crée un sondage avec chaque réponse et des réactions numérotées clicables
+* [x] **`!robert poll "ce midi ?" "pizza" "kebab" "sushis"`** : crée un sondage avec chaque réponse et des réactions numérotées cliquables
 
     ce midi ?\
     :zero: pizza\
@@ -67,7 +67,7 @@ Il reconnait aussi la syntaxe latex :
 ```
 \`\`\`
 
-**robert_le_robot** BOT 04:20
+**robert_le_robot** BOT 04:20\
 > 1.000
 
 ## Librairies :
