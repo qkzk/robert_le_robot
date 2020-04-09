@@ -10,8 +10,8 @@ from pprint import pprint
 from constants import VERBOSE
 from constants import DEFAULT_MUTE_DURATION
 
-from mattermost_api import create_driver
 from mattermost_api import driver_create_login_get_info
+from mattermost_api import get_all_channels
 
 from logging_system import logger
 
@@ -54,7 +54,9 @@ class Robert:
         self.__state = {}
         self.__driver, self.__id, self.__username = driver_create_login_get_info()
         self.logger.info("init websocket")
-        self.set_mode("normal")
+        self.channel_ids = get_all_channels()
+        self.channel_mode = self.default_mode()
+        # self.set_mode("normal")
         # self.set_mode("mute", param={
         #     "duration": timedelta(seconds=DEFAULT_MUTE_DURATION),
         #     "channel_id": "rkrfn5yeob8zijd9tb5rfq9j3e"})
@@ -64,14 +66,17 @@ class Robert:
             print("start async message_handler")
         self.__driver.init_websocket(self.__message_handler)
 
+    def get_driver(self):
+        return self.__driver
+
     def id(self):
         return self.__id
 
     def username(self):
         return self.__username
 
-    def get_driver(self):
-        return self.__driver
+    def channels():
+        return self.__channel_ids
 
     def get_state(self):
         return self.__state
@@ -98,16 +103,25 @@ class Robert:
                        channel_id=channel_id)
             self.delete_state_for_user(user_id)
 
-    def set_mode(self, mode, param=None):
-        self.__robert_status = {
-            "date": datetime.now(),
-            "mode": mode
+    def default_mode(self):
+        return {
+            channel_id: {
+                "channel_id": channel_id,
+                "muted": False,
+            } for channel_id in self.channel_ids
+        }
+
+    def set_channel_mode(self, channel_id, mute_status, param=None):
+        next_mode = {
+            "channel_id": channel_id,
+            "mute": mute_status,
         }
         if param is not None:
-            self.__robert_status = dict(self.__robert_status, **param)
+            next_mode = dict(next_mode, **param)
+        self.channel_mode[channel_id] = next_mode
 
-    def get_mode(self):
-        return self.__robert_status
+    def get_channel_mode(self, channel_id):
+        return self.channel_mode.get(channel_id)
 
     @asyncio.coroutine
     def __message_handler(self, message):

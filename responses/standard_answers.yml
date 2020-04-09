@@ -12,8 +12,8 @@
 
   1. **`!robert help`** (ou **aide**) : affiche ce message d'**aide**,
   2. **`!robert date`** (ou **`heure`** ou **`aujourd'hui`**) : affiche **l'heure**,
-  3. **`!robert python {nom_d_objet}`** : affiche l'aide d'un objet **python**,
-  4. **`!robert latex {syntaxe latex}`** : tente d'évaluer une commande **latex**. J'arrondis la valeur après 4 décimales.
+  3. **`!robert python nom_d_objet`** : affiche l'aide d'un objet **python**,
+  4. **`!robert latex syntaxe latex`** : tente d'évaluer une commande **latex**. J'arrondis la valeur après 4 décimales.
   5. **`!robert travail [nombre]`** (**`nombre`** est optionnel) : affiche une brève description des derniers travaux déposés sur classroom.
 
   Je reconnais aussi la syntaxe latex :
@@ -26,3 +26,17 @@
   * _déposé le_ : {1}
   * _à rendre le_: {2}
   * [consulter le travail]({3}) (_vous devez être connecté à [classroom](https://classroom.google.com) avec le bon compte_)
+'help_admin': |
+
+  Les commandes réservées aux administrateurs sont :
+    1. **`!robert mute [duree / off]`**: rend un canal silencieux pendant `duree` minutes
+
+          Durée par défaut {0} minutes. `!robert mute off` pour sortir du mute.
+          Les administrateurs peuvent toujours s'exprimer.
+    2. **`!robert clear`**: efface tous les messages d'un canal.
+
+        _Requiert une confirmation avec_ `!robert confirmer`
+    3. **`!robert delete username`**: efface tous les messages d'un utilisateur.
+
+        _Requiert une confirmation avec_ `!robert confirmer`
+    4. **`!robert session username`**: affiche toutes les sessions d'un utilisateur

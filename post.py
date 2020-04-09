@@ -8,7 +8,7 @@ from constants import START_COMMAND
 from constants import START_LATEX
 from constants import END_LATEX
 
-from mattermost_api import get_user_by_id
+from mattermost_api import is_user_admin
 
 from utils import read_from_file
 
@@ -76,7 +76,8 @@ class Post:
                 print("message_content", self.__message_content)
                 print("team_id", self.__team_id)
 
-            if self.__bot.get_mode()["mode"] == "mute":
+            # if self.__bot.get_mode()["mode"] == "mute":
+            if self.__bot.get_channel_mode(self.__channel_id).get("mute"):
                 self.__check_back_normal_or_deleted()
 
             if self.__delete_post:
@@ -88,7 +89,7 @@ class Post:
                 self.__check_command_and_reply()
 
     def __check_back_normal_or_deleted(self):
-        bot_mode = self.__bot.get_mode()
+        bot_mode = self.__bot.get_channel_mode(self.__channel_id)
         duration = bot_mode.get("duration")
         date = bot_mode.get("date")
         now = datetime.now()
@@ -110,14 +111,13 @@ class Post:
             self.__delete_post = self.__check_must_be_deleted()
 
     def __check_must_be_deleted(self):
-        sender_infos = get_user_by_id(self.__sender_user_id)
-        muted_channel = self.__bot.get_mode().get('channel_id')
+        is_muted_channel = self.__bot.get_channel_mode(
+            self.__channel_id).get('mute')
+        is_sender_admin = is_user_admin(self.__sender_user_id)
         if VERBOSE:
-            print("muted_channel: ", muted_channel)
-            print("channel_id: ", self.__channel_id)
-            print("sender is not admin ? ",
-                  'system_admin' not in sender_infos.get('roles'))
-        if self.__post_to_delete(muted_channel, sender_infos):
+            print("muted_channel ? ", is_muted_channel)
+            print("sender is not admin ? ", is_sender_admin)
+        if is_muted_channel and not is_sender_admin:
             return True
             return False
 

@@ -7,21 +7,23 @@ from datetime import timedelta
 from sympy.parsing.latex import parse_latex
 
 from classroom_api import retrieve_parse_works
-from constants import VERBOSE
+
 from constants import DATETIME_FORMAT
 from constants import DEFAULT_MUTE_DURATION
 from constants import PATH_TEAM_CLASSROOM
+from constants import VERBOSE
 
 from utils import get_standard_answers, read_yaml_file
 
-from mattermost_api import get_user_by_id
-from mattermost_api import get_user
-from mattermost_api import get_user_sessions_from_api
-from mattermost_api import get_team_from_channel
-from mattermost_api import get_post_for_channel
 from mattermost_api import delete_posts_from_list_id
-from mattermost_api import get_all_posts_from_username
 from mattermost_api import delete_this_post
+from mattermost_api import get_all_posts_from_username
+from mattermost_api import get_user
+from mattermost_api import get_user_by_id
+from mattermost_api import get_user_sessions_from_api
+from mattermost_api import get_post_for_channel
+from mattermost_api import get_team_from_channel
+from mattermost_api import is_user_admin
 
 
 ASSOCIATIONS_TEAM_CLASSROOM = read_yaml_file(PATH_TEAM_CLASSROOM)
@@ -44,12 +46,6 @@ class Response:
         # TODO duplicate
         user_data = get_user(username)
         return user_data.get("id")
-
-    def is_role_admin(self, sender_info):
-        roles = sender_info.get('roles')
-        if roles is not None and 'system_admin' in roles:
-            return True
-        return False
 
     def answer(self):
         return ''
@@ -74,9 +70,11 @@ class HelpResponse(Response):
         super(HelpResponse, self).__init__(parameters)
 
     def answer(self):
-        return self.standard_answers["help"]
-        # with open(PATH_ANSWER_HELP) as f:
-        #     return f.read()
+        text = self.standard_answers["help"]
+        if is_user_admin(self.sender_user_id):
+            text += self.standard_answers["help_admin"].format(
+                DEFAULT_MUTE_DURATION // 60)
+        return text
 
 
 class ClassroomResponse(Response):
@@ -93,8 +91,9 @@ class ClassroomResponse(Response):
             print(last_param)
             can_continue = True
         except (ValueError, TypeError) as e:
-            print("ClassroomResponse.answer : impossible to read the command")
-            print(repr(e))
+            if VERBOSE:
+                print("ClassroomResponse.answer : impossible to read the command")
+                print(repr(e))
             answer = None
             can_continue = False
         if can_continue:
@@ -141,6 +140,7 @@ class PythonResponse(Response):
         retourne l'aide d'un module python formattée
         https://stackoverflow.com/questions/15133537/pydoc-render-doc-adds-characters-how-to-avoid-that
         '''
+        self.command = self.command.lower()
         help_seeked_on = self.command.split("python")[1].strip()
         if VERBOSE:
             print("help_seeked_on", help_seeked_on)
@@ -201,7 +201,7 @@ class SessionResponse(Response):
               self.sender_user_id, type(self.sender_user_id))
 
         sender_info = get_user_by_id(self.sender_user_id)
-        is_admin = self.is_role_admin(sender_info)
+        is_admin = is_user_admin(self.sender_user_id)
         username = self.__get_user_name_from_info(sender_info)
 
         if is_admin:
@@ -246,14 +246,6 @@ class SessionResponse(Response):
         answer += '\n'
         return answer
 
-    # def get_user_id_from_username(self, username):
-    #     user_data = get_user(username)
-    #     return user_data.get("id")
-    #
-    # def __username_from_user_id(self, user_id):
-    #     user_data = get_user_by_id(user_id)
-    #     return user_data.get("username")
-
     def __get_user_name_from_info(self, sender_info):
         return sender_info.get('username')
 
@@ -264,16 +256,10 @@ class ClearResponse(Response):
 
     def answer(self):
         sender_info = get_user_by_id(self.sender_user_id)
-        if self.is_role_admin(sender_info):
+        if is_user_admin(self.sender_user_id):
             self.__clear_channel()
         else:
             return self.standard_answers["cannot_do"]
-
-    # def is_role_admin(self, sender_info):
-    #     roles = sender_info.get('roles')
-    #     if roles is not None and 'system_admin' in roles:
-    #         return True
-    #         return False
 
     def __clear_channel(self):
         channel_post_ids = get_post_for_channel(self.channel_id)
@@ -286,16 +272,12 @@ class DeteleResponse(Response):
 
     def answer(self):
         sender_info = get_user_by_id(self.sender_user_id)
-        if self.is_role_admin(sender_info):
+        if is_user_admin(self.sender_user_id):
             self.__delete_messages()
         else:
             return self.standard_answers["cannot_do"]
 
     def __delete_messages(self):
-
-        # print("\ndelete messages")
-        # print(self.command)
-        # username_mentioned = self.command.split('delete')[1].strip()
 
         bot_status = self.bot.get_state_for_user(self.sender_user_id)
         username_mentioned = ''
@@ -315,40 +297,22 @@ class DeteleResponse(Response):
                     print("__delete_messages")
                     print(repr(e))
 
-    # def is_role_admin(self, sender_info):
-    #     # TODO duplicate
-    #     roles = sender_info.get('roles')
-    #     if roles is not None and 'system_admin' in roles:
-    #         return True
-    #         return False
-
-    # def get_user_id_from_username(self, username):
-    #     # TODO duplicate
-    #     user_data = get_user(username)
-    #     return user_data.get("id")
-
 
 class AskConfirmationResponse(Response):
     def __init__(self, parameters):
         super(AskConfirmationResponse, self).__init__(parameters)
 
-    def is_role_admin(self, sender_info):
-        roles = sender_info.get('roles')
-        if roles is not None and 'system_admin' in roles:
-            return True
-            return False
-
     def answer(self):
         sender_info = get_user_by_id(self.sender_user_id)
         answer = self.standard_answers["cannot_do"]
-        if self.is_role_admin(sender_info):
+        if is_user_admin(self.sender_user_id):
             answer = self.standard_answers['confirmer'].format(self.command)
         self.bot.logger.info("reply sent : {}".format(answer))
         return answer
 
     def reply(self):
         sender_info = get_user_by_id(self.sender_user_id)
-        if self.is_role_admin(sender_info):
+        if is_user_admin(self.sender_user_id):
             self.bot.set_state_for_user(
                 self.sender_user_id,
                 (self.channel_id, self.command))
@@ -386,7 +350,7 @@ class DeletePostResponse(Response):
     def reply(self):
         sender_info = get_user_by_id(self.sender_user_id)
         post_to_delete = self.command.split("delete_this_post")[1].strip()
-        if not self.is_role_admin(sender_info):
+        if not is_user_admin(self.sender_user_id):
             if VERBOSE:
                 print("\n######## DeletePostResponse : must be deleted")
             delete_this_post(self.post_id)
@@ -403,8 +367,8 @@ class MuteResponse(Response):
         self.stop_mute = False
 
     def reply(self):
-        sender_info = get_user_by_id(self.sender_user_id)
-        if self.is_role_admin(sender_info):
+        is_sender_admin = is_user_admin(self.sender_user_id)
+        if is_sender_admin:
             try:
                 param = self.command.split('mute')[1].strip()
                 if param == "off":
@@ -415,12 +379,14 @@ class MuteResponse(Response):
                 if VERBOSE:
                     print(repr(e))
             if self.stop_mute:
-                self.bot.set_mode('normal')
+                self.bot.set_channel_mode(self.channel_id, False)
             else:
-                self.bot.set_mode("mute", param={
-                    "duration": timedelta(seconds=self.duration),
-                    "channel_id": self.channel_id
-                })
+                self.bot.set_channel_mode(
+                    self.channel_id,
+                    True,
+                    param={
+                        "duration": timedelta(seconds=self.duration),
+                    })
             return self.answer()
 
     def answer(self):

@@ -212,3 +212,15 @@ def add_bot_all_channels():
 def delete_this_post(post_id):
     driver = create_driver_and_login()
     driver.posts.delete_post(post_id)
+
+
+def is_user_admin(user_id=None, username=None):
+    driver = create_driver_and_login()
+    if user_id is None and username is None:
+        raise ValueError("You must provide an user_id or a username")
+    if user_id is not None:
+        user = get_user_by_id(user_id)
+    elif username is not None:
+        user = get_user(username)
+    roles = user.get('roles')
+    return roles is not None and "system_admin" in roles
