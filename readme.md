@@ -44,7 +44,7 @@ L'objectif de Robert est d'apporter un peu de facilité aux enseignants et aux
     2 :heavy_check_mark:\
     3 :checkered_flag:
 
-* [ ] **python example list** : afficher quelques exemples de syntaxes
+* [ ] **`python example list`** : afficher quelques exemples de syntaxes
 
     ```python
     >>> ma_liste = [] # créer une liste vide
@@ -67,6 +67,8 @@ Il reconnait aussi la syntaxe latex :
 ```
 \`\`\`
 
+**robert_le_robot** BOT 04:20
+> 1.000
 
 ## Librairies :
 
