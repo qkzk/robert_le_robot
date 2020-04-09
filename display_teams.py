@@ -14,7 +14,7 @@ def display_teams():
     '''
     affiche dans la console toutes les équipes Mattermost d'un bot
     '''
-    driver = create_driver_and_login()
+    driver = driver_create_login()
     bot_id = None
     try:
         mattermost_bot_user = driver.users.get_user_by_username(BOT_USERNAME)

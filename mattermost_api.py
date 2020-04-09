@@ -29,7 +29,7 @@ def get_options():
     return options
 
 
-def create_driver(options=None):
+def driver_create(options=None):
     '''
     Retourne une instance de Driver qui permet d'envoyer des commandes
     au serveur
@@ -40,10 +40,18 @@ def create_driver(options=None):
     return driver
 
 
-def create_driver_and_login(options=None):
-    driver = create_driver(options=None)
+def driver_create_login(options=None):
+    driver = driver_create(options=None)
     driver.login()
     return driver
+
+
+def driver_create_login_get_info():
+    driver = driver_create()
+    result = driver.login()
+    bot_id = result.get("id")
+    bot_username = result.get("username")
+    return driver, bot_id, bot_username
 
 
 def get_user(username, driver=None):
@@ -51,7 +59,7 @@ def get_user(username, driver=None):
     if VERBOSE:
         print(f"\nget user {username}")
     if driver is None:
-        driver = create_driver()
+        driver = driver_create()
     driver.login()
     user = driver.users.get_user_by_username(username)
     if VERBOSE:
@@ -66,7 +74,7 @@ def get_user_by_id(user_id, driver=None):
     if VERBOSE:
         print(f"\nget user {user_id}")
     if driver is None:
-        driver = create_driver()
+        driver = driver_create()
     driver.login()
     user = driver.users.get_user(user_id)
     if VERBOSE:
@@ -75,26 +83,21 @@ def get_user_by_id(user_id, driver=None):
     return user
 
 
-def get_channel_info_from_channel_id(channel_id, driver=None):
-    if driver is None:
-        driver = create_driver()
-    driver.login()
-    channel_info = driver.channels.get_channel(channel_id)
-    if VERBOSE:
-        pprint(channel_info)
-    return channel_info
-
-
-def get_team_from_channel(channel_id, driver=None):
-    mattermost_answer = get_channel_info_from_channel_id(channel_id,
-                                                         driver=driver)
-    team_id = mattermost_answer.get('team_id')
-    return team_id
+def is_user_admin(user_id=None, username=None):
+    driver = driver_create_login()
+    if user_id is None and username is None:
+        raise ValueError("You must provide an user_id or a username")
+    if user_id is not None:
+        user = get_user_by_id(user_id)
+    elif username is not None:
+        user = get_user(username)
+    roles = user.get('roles')
+    return roles is not None and "system_admin" in roles
 
 
 def get_user_sessions_from_api(user_id, driver=None):
     if driver is None:
-        driver = create_driver()
+        driver = driver_create()
     driver.login()
     sessions = driver.users.get_user_sessions(user_id)
     if VERBOSE:
@@ -104,7 +107,7 @@ def get_user_sessions_from_api(user_id, driver=None):
 
 def get_user_audits_from_api(user_id, driver=None):
     if driver is None:
-        driver = create_driver()
+        driver = driver_create()
     driver.login()
     audits = driver.users.get_user_audits(user_id)
     if VERBOSE:
@@ -112,8 +115,55 @@ def get_user_audits_from_api(user_id, driver=None):
     return audits
 
 
+def add_user_to_team(team_id, user_id):
+    driver, bot_id, bot_username = driver_create_login_get_info()
+    options = {
+        "team_id": team_id,
+        "user_id": bot_id
+    }
+    result = driver.teams.add_user_to_team(team_id, options=options)
+    driver.logout()
+    return result
+
+
+def get_teams_id():
+    driver = driver_create_login()
+    teams = driver.teams.get_teams()
+    return [team.get('id') for team in teams]
+
+
+def get_team_from_channel(channel_id, driver=None):
+    mattermost_answer = get_channel_info_from_channel_id(channel_id,
+                                                         driver=driver)
+    team_id = mattermost_answer.get('team_id')
+    return team_id
+
+
+def get_channel_info_from_channel_id(channel_id, driver=None):
+    if driver is None:
+        driver = driver_create()
+    driver.login()
+    channel_info = driver.channels.get_channel(channel_id)
+    if VERBOSE:
+        pprint(channel_info)
+    return channel_info
+
+
+def get_all_channels():
+    driver = driver_create_login()
+    team_ids = get_teams_id()
+    channel_list = []
+    for team_id in team_ids:
+        channel_list += driver.teams.get_public_channels(team_id)
+    return [
+        channel.get('id')
+        for channel in channel_list
+        if channel.get('id') is not None
+    ]
+
+
 def get_post_for_channel(channel_id):
-    driver = create_driver_and_login()
+    driver = driver_create_login()
     posts = driver.channels.get_posts(channel_id)
     print("\n channel post ids :")
     print("\nposts for channel {}".format(channel_id))
@@ -130,47 +180,26 @@ def get_ids_from_posts(posts):
 
 
 def delete_posts_from_list_id(post_ids):
-    driver = create_driver_and_login()
+    driver = driver_create_login()
     for post_id in post_ids:
         driver.posts.delete_post(post_id)
 
 
-def driver_create_login_get_info():
-    # TODO pourquoi retourner 3 TRUCS PUTAIN
-    driver = create_driver()
-    result = driver.login()
-    bot_id = result.get("id")
-    bot_username = result.get("username")
-    return driver, bot_id, bot_username
-
-
-def get_teams_id():
-    driver = create_driver_and_login()
-    teams = driver.teams.get_teams()
-    return [team.get('id') for team in teams]
+def delete_this_post(post_id):
+    driver = driver_create_login()
+    driver.posts.delete_post(post_id)
 
 
 def get_all_posts_from_username(username):
     '''à editer, il faut encore retrouver les teams_id'''
     teams_id = get_teams_id()
     posts = []
-    driver = create_driver_and_login()
+    driver = driver_create_login()
     for team_id in teams_id:
         posts += driver.posts.search_for_team_posts(
             team_id,
             options={'terms': 'from:{}'.format(username)}).get('order')
     return posts
-
-
-def add_user_to_team(team_id, user_id):
-    driver, bot_id, bot_username = driver_create_login_get_info()
-    options = {
-        "team_id": team_id,
-        "user_id": bot_id
-    }
-    result = driver.teams.add_user_to_team(team_id, options=options)
-    driver.logout()
-    return result
 
 
 def add_bot_to_list_teams(team_ids):
@@ -185,19 +214,6 @@ def add_bot_to_all_teams():
     add_bot_to_list_teams(team_ids)
 
 
-def get_all_channels():
-    driver = create_driver_and_login()
-    team_ids = get_teams_id()
-    channel_list = []
-    for team_id in team_ids:
-        channel_list += driver.teams.get_public_channels(team_id)
-    return [
-        channel.get('id')
-        for channel in channel_list
-        if channel.get('id') is not None
-    ]
-
-
 def add_bot_all_channels():
     driver, bot_id, bot_username = driver_create_login_get_info()
 
@@ -207,20 +223,3 @@ def add_bot_all_channels():
             "user_id": bot_id,
         }
         driver.channels.add_user(channel_id, options=options)
-
-
-def delete_this_post(post_id):
-    driver = create_driver_and_login()
-    driver.posts.delete_post(post_id)
-
-
-def is_user_admin(user_id=None, username=None):
-    driver = create_driver_and_login()
-    if user_id is None and username is None:
-        raise ValueError("You must provide an user_id or a username")
-    if user_id is not None:
-        user = get_user_by_id(user_id)
-    elif username is not None:
-        user = get_user(username)
-    roles = user.get('roles')
-    return roles is not None and "system_admin" in roles

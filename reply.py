@@ -134,7 +134,7 @@ class Reply:
         }
 
     def __send_reply(self):
-        self.__driver = create_driver()
+        self.__driver = driver_create()
         self.__driver.login()
         if VERBOSE:
             print('\nReply send logged in')
