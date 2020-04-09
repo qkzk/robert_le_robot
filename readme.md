@@ -37,7 +37,7 @@ L'objectif de Robert est d'apporter un peu de facilité aux enseignants et aux
     :two: sushis
 
 * [ ] d'autres idées... parmi lesquelles : exécuter un script python, "panic mode : révoquer toutes les sessions", nettoyer tous les posts ayant plus de tel age dans la bdd, rendre silencieux un utilisateur,
-* [ ] **avancee** : !robert progression 3
+* [ ] **`!robert progression 3`** : permet aux élèves de valider les étapes d'un travail en validant des réactions
 
     Quelles étapes avez-vous réussies ?
 
