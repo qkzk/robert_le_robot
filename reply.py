@@ -109,15 +109,15 @@ class Reply:
             print("\n##############################################\n")
             print("bot_command_options received", self.__command)
 
-        words = self.__command.split(' ')
+        command_words = self.__command.split(' ')
 
-        keyword = words[0].lower()
+        keyword = command_words[0].lower()
         self.__response_class = self.__keywords_reactions.get(keyword)
 
         if self.__response_class is None:
             if VERBOSE:
                 print("\n##############################################\n")
-                print("words", words)
+                print("command_words", command_words)
             if self.__latex_syntax:
                 if VERBOSE:
                     print("\n##############################################\n")

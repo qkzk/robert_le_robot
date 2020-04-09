@@ -83,6 +83,11 @@ def get_user_by_id(user_id, driver=None):
     return user
 
 
+def get_user_id_from_username(username):
+    user_data = get_user(username)
+    return user_data.get("id")
+
+
 def is_user_admin(user_id=None, username=None):
     driver = driver_create_login()
     if user_id is None and username is None:

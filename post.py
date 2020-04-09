@@ -38,7 +38,6 @@ class Post:
             if 'data' in msg_json and 'post' in msg_json['data']:
                 msg_json_data_post = msg_json['data']['post']
                 team_id = msg_json['data'].get('team_id')
-
                 if VERBOSE:
                     print('classmethod : Post from_json')
                     pprint(msg_json_data_post)
@@ -76,7 +75,6 @@ class Post:
                 print("message_content", self.__message_content)
                 print("team_id", self.__team_id)
 
-            # if self.__bot.get_mode()["mode"] == "mute":
             if self.__bot.get_channel_mode(self.__channel_id).get("mute"):
                 self.__check_back_normal_or_deleted()
 
@@ -91,14 +89,14 @@ class Post:
     def __check_back_normal_or_deleted(self):
         bot_mode = self.__bot.get_channel_mode(self.__channel_id)
         duration = bot_mode.get("duration")
-        date = bot_mode.get("date")
+        date_muted = bot_mode.get("date")
         now = datetime.now()
         back_to_normal = False
         try:
-            seconds_spent = (now - date).seconds
-            if now - date > duration:
+            if now - date_muted > duration:
                 back_to_normal = True
             if VERBOSE:
+                seconds_spent = (now - date_muted).seconds
                 print("Post : muted since {} seconds".format(seconds_spent))
         except TypeError as e:
             if VERBOSE:

@@ -20,6 +20,7 @@ from mattermost_api import delete_this_post
 from mattermost_api import get_all_posts_from_username
 from mattermost_api import get_user
 from mattermost_api import get_user_by_id
+from mattermost_api import get_user_id_from_username
 from mattermost_api import get_user_sessions_from_api
 from mattermost_api import get_post_for_channel
 from mattermost_api import get_team_from_channel
@@ -41,11 +42,6 @@ class Response:
         self.team_id = parameters["team_id"]
         self.latex_syntax = parameters["latex_syntax"]
         self.post_id = parameters["post_id"]
-
-    def get_user_id_from_username(self, username):
-        # TODO duplicate
-        user_data = get_user(username)
-        return user_data.get("id")
 
     def answer(self):
         return ''
@@ -124,9 +120,6 @@ class DateResponse(Response):
         super(DateResponse, self).__init__(parameters)
 
     def answer(self):
-        '''
-        retourne l'heure formattée
-        '''
         now = datetime.now()
         return now.strftime(DATETIME_FORMAT)
 
@@ -146,10 +139,10 @@ class PythonResponse(Response):
             print("help_seeked_on", help_seeked_on)
         try:
             answer = pydoc.render_doc(help_seeked_on,
-                                      "Voici l'aide de **%s**",
+                                      standard_answers['python_doc'],
                                       renderer=pydoc.plaintext)[:16383]
         except ImportError as e:
-            answer = f"Il n'y a pas d'aide pour **{help_seeked_on}**"
+            answer = self.standard_answers['python_no_doc'].format(help_seeked_on)
         return answer
 
 
@@ -197,17 +190,13 @@ class SessionResponse(Response):
         super(SessionResponse, self).__init__(parameters)
 
     def answer(self):
-        print("Reply.__format_answer_session received selfsender_user_id",
-              self.sender_user_id, type(self.sender_user_id))
-
         sender_info = get_user_by_id(self.sender_user_id)
         is_admin = is_user_admin(self.sender_user_id)
-        username = self.__get_user_name_from_info(sender_info)
 
         if is_admin:
             user_asked_about = self.command.split("session")[1].strip()
             try:
-                user_id_asked_about = self.get_user_id_from_username(
+                user_id_asked_about = get_user_id_from_username(
                     user_asked_about)
 
                 sessions = get_user_sessions_from_api(user_id_asked_about)
@@ -221,10 +210,8 @@ class SessionResponse(Response):
                 answer = self.standard_answers['invalid_user']
         else:
             if VERBOSE:
-                print("user {0} - {1} session. Permission denied".format(
-                    username,
-                    self.sender_user_id
-                ))
+                print("Permission denied for {0}".format(self.sender_user_id))
+            logger.info("Permission denied for {0}".format(self.sender_user_id))
             answer = self.standard_answers['cannot_do']
         return answer
 
@@ -239,9 +226,9 @@ class SessionResponse(Response):
         last_activity_at = datetime.fromtimestamp(
             session.get('last_activity_at') // 1000)
 
-        answer += 'Connexion de {} '.format(username)
+        answer += standard_answers['session_start'].format(username)
         answer += datetime.strftime(create_at, self.FORMAT_SESSION_DATE)
-        answer += ' jusque '
+        answer += standard_answers['session_end']
         answer += datetime.strftime(last_activity_at, self.FORMAT_SESSION_DATE)
         answer += '\n'
         return answer
@@ -259,6 +246,7 @@ class ClearResponse(Response):
         if is_user_admin(self.sender_user_id):
             self.__clear_channel()
         else:
+            logger.info("Permission denied for {0}".format(self.sender_user_id))
             return self.standard_answers["cannot_do"]
 
     def __clear_channel(self):
@@ -275,6 +263,7 @@ class DeteleResponse(Response):
         if is_user_admin(self.sender_user_id):
             self.__delete_messages()
         else:
+            logger.info("Permission denied for {0}".format(self.sender_user_id))
             return self.standard_answers["cannot_do"]
 
     def __delete_messages(self):
@@ -384,9 +373,7 @@ class MuteResponse(Response):
                 self.bot.set_channel_mode(
                     self.channel_id,
                     True,
-                    param={
-                        "duration": timedelta(seconds=self.duration),
-                    })
+                    param={"duration": timedelta(seconds=self.duration)})
             return self.answer()
 
     def answer(self):

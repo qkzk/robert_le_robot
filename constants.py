@@ -15,5 +15,6 @@ END_LATEX = "\n```"
 
 # Formatting options
 DATETIME_FORMAT = "La date est %Y-%m-%d et il est %H:%M"
+LOG_FORMAT = '%(asctime)s %(levelname)s %(pathname)s %(funcName)s(%(lineno)d) %(message)s'
 
 DEFAULT_MUTE_DURATION = 60
