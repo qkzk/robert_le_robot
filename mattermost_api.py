@@ -207,3 +207,8 @@ def add_bot_all_channels():
             "user_id": bot_id,
         }
         driver.channels.add_user(channel_id, options=options)
+
+
+def delete_this_post(post_id):
+    driver = create_driver_and_login()
+    driver.posts.delete_post(post_id)

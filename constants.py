@@ -15,3 +15,5 @@ END_LATEX = "\n```"
 
 # Formatting options
 DATETIME_FORMAT = "La date est %Y-%m-%d et il est %H:%M"
+
+DEFAULT_MUTE_DURATION = 60

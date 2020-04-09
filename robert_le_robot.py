@@ -1,10 +1,14 @@
 import asyncio
 import json
+
+from datetime import datetime
+from datetime import timedelta
 from pprint import pprint
 
 # own
 
 from constants import VERBOSE
+from constants import DEFAULT_MUTE_DURATION
 
 from mattermost_api import create_driver
 from mattermost_api import driver_create_login_get_info
@@ -49,12 +53,15 @@ class Robert:
         self.logger = logger
         self.__state = {}
         self.__driver, self.__id, self.__username = driver_create_login_get_info()
+        self.logger.info("init websocket")
+        self.set_mode("normal")
+        # self.set_mode("mute", param={
+        #     "duration": timedelta(seconds=DEFAULT_MUTE_DURATION),
+        #     "channel_id": "rkrfn5yeob8zijd9tb5rfq9j3e"})
 
         if VERBOSE:
             print("\n###############################################\n")
             print("start async message_handler")
-
-        self.logger.info("init websocket")
         self.__driver.init_websocket(self.__message_handler)
 
     def id(self):
@@ -90,6 +97,17 @@ class Robert:
                        sender_user_id=user_id,
                        channel_id=channel_id)
             self.delete_state_for_user(user_id)
+
+    def set_mode(self, mode, param=None):
+        self.__robert_status = {
+            "date": datetime.now(),
+            "mode": mode
+        }
+        if param is not None:
+            self.__robert_status = dict(self.__robert_status, **param)
+
+    def get_mode(self):
+        return self.__robert_status
 
     @asyncio.coroutine
     def __message_handler(self, message):

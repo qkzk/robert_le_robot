@@ -10,6 +10,7 @@ func GetDMNameFromIds(userId1, userId2 string) string {
         return userId1 + "__" + userId2
     }
 '''
+from datetime import timedelta
 from pprint import pprint
 
 from constants import VERBOSE
@@ -27,6 +28,8 @@ from responses import ClearResponse
 from responses import DeteleResponse
 from responses import AskConfirmationResponse
 from responses import ExecuteConfirmationResponse
+from responses import DeletePostResponse
+from responses import MuteResponse
 
 
 class Reply:
@@ -36,14 +39,18 @@ class Reply:
                  latex_syntax=False,
                  sender_user_id=None,
                  channel_id=None,
-                 team_id=None):
+                 team_id=None,
+                 post_id=None,
+                 delete_post=False):
 
         self.__bot = bot
         self.__command = command
         self.__latex_syntax = latex_syntax
         self.__channel_id = channel_id
         self.__team_id = team_id
+        self.__post_id = post_id
         self.__sender_user_id = sender_user_id
+        self.__delete_post = delete_post
 
         self.__driver = None
         self.__reply_parameters = None
@@ -63,6 +70,8 @@ class Reply:
             'delete': AskConfirmationResponse,
             'demander': AskConfirmationResponse,
             'confirmer': ExecuteConfirmationResponse,
+            'delete_this_post': DeletePostResponse,
+            'mute': MuteResponse,
         }
         return reactions
 
@@ -91,6 +100,7 @@ class Reply:
             "channel_id": self.__channel_id,
             "team_id": self.__team_id,
             "latex_syntax": self.__latex_syntax,
+            "post_id": self.__post_id,
         }
 
     def __create_options(self):

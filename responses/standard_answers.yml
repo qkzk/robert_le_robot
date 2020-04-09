@@ -3,6 +3,8 @@
 'cannot_do': '_Je ne peux pas faire ça_'
 'invalid_user': '_Rien trouvé sur cet utilisateur._'
 'confirmer': '_Valider la commande_ **{}** _?_ (`!robert confirmer`)'
+'mute_channel': _Canal silencieux pendant {} minutes_
+'mute_off': _Le canal n'est plus silencieux_
 'help': |
   Bonjour, mon nom est **Robert**.
 

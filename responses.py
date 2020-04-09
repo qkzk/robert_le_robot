@@ -2,15 +2,16 @@ from pprint import pprint
 import pydoc
 
 from datetime import datetime
+from datetime import timedelta
 
 from sympy.parsing.latex import parse_latex
 
 from classroom_api import retrieve_parse_works
 from constants import VERBOSE
 from constants import DATETIME_FORMAT
-# from constants import PATH_ANSWER_HELP
+from constants import DEFAULT_MUTE_DURATION
 from constants import PATH_TEAM_CLASSROOM
-# from constants import PATH_ANSWER_HELP
+
 from utils import get_standard_answers, read_yaml_file
 
 from mattermost_api import get_user_by_id
@@ -20,6 +21,7 @@ from mattermost_api import get_team_from_channel
 from mattermost_api import get_post_for_channel
 from mattermost_api import delete_posts_from_list_id
 from mattermost_api import get_all_posts_from_username
+from mattermost_api import delete_this_post
 
 
 ASSOCIATIONS_TEAM_CLASSROOM = read_yaml_file(PATH_TEAM_CLASSROOM)
@@ -36,6 +38,18 @@ class Response:
         self.channel_id = parameters["channel_id"]
         self.team_id = parameters["team_id"]
         self.latex_syntax = parameters["latex_syntax"]
+        self.post_id = parameters["post_id"]
+
+    def get_user_id_from_username(self, username):
+        # TODO duplicate
+        user_data = get_user(username)
+        return user_data.get("id")
+
+    def is_role_admin(self, sender_info):
+        roles = sender_info.get('roles')
+        if roles is not None and 'system_admin' in roles:
+            return True
+        return False
 
     def answer(self):
         return ''
@@ -187,13 +201,13 @@ class SessionResponse(Response):
               self.sender_user_id, type(self.sender_user_id))
 
         sender_info = get_user_by_id(self.sender_user_id)
-        is_admin = self.__is_role_admin(sender_info)
+        is_admin = self.is_role_admin(sender_info)
         username = self.__get_user_name_from_info(sender_info)
 
         if is_admin:
             user_asked_about = self.command.split("session")[1].strip()
             try:
-                user_id_asked_about = self.__get_user_id_from_username(
+                user_id_asked_about = self.get_user_id_from_username(
                     user_asked_about)
 
                 sessions = get_user_sessions_from_api(user_id_asked_about)
@@ -232,9 +246,9 @@ class SessionResponse(Response):
         answer += '\n'
         return answer
 
-    def __get_user_id_from_username(self, username):
-        user_data = get_user(username)
-        return user_data.get("id")
+    # def get_user_id_from_username(self, username):
+    #     user_data = get_user(username)
+    #     return user_data.get("id")
     #
     # def __username_from_user_id(self, user_id):
     #     user_data = get_user_by_id(user_id)
@@ -243,12 +257,6 @@ class SessionResponse(Response):
     def __get_user_name_from_info(self, sender_info):
         return sender_info.get('username')
 
-    def __is_role_admin(self, sender_info):
-        roles = sender_info.get('roles')
-        if roles is not None and 'system_admin' in roles:
-            return True
-        return False
-
 
 class ClearResponse(Response):
     def __init__(self, parameters):
@@ -256,16 +264,16 @@ class ClearResponse(Response):
 
     def answer(self):
         sender_info = get_user_by_id(self.sender_user_id)
-        if self.__is_role_admin(sender_info):
+        if self.is_role_admin(sender_info):
             self.__clear_channel()
         else:
             return self.standard_answers["cannot_do"]
 
-    def __is_role_admin(self, sender_info):
-        roles = sender_info.get('roles')
-        if roles is not None and 'system_admin' in roles:
-            return True
-            return False
+    # def is_role_admin(self, sender_info):
+    #     roles = sender_info.get('roles')
+    #     if roles is not None and 'system_admin' in roles:
+    #         return True
+    #         return False
 
     def __clear_channel(self):
         channel_post_ids = get_post_for_channel(self.channel_id)
@@ -278,7 +286,7 @@ class DeteleResponse(Response):
 
     def answer(self):
         sender_info = get_user_by_id(self.sender_user_id)
-        if self.__is_role_admin(sender_info):
+        if self.is_role_admin(sender_info):
             self.__delete_messages()
         else:
             return self.standard_answers["cannot_do"]
@@ -307,24 +315,24 @@ class DeteleResponse(Response):
                     print("__delete_messages")
                     print(repr(e))
 
-    def __is_role_admin(self, sender_info):
-        # TODO duplicate
-        roles = sender_info.get('roles')
-        if roles is not None and 'system_admin' in roles:
-            return True
-            return False
+    # def is_role_admin(self, sender_info):
+    #     # TODO duplicate
+    #     roles = sender_info.get('roles')
+    #     if roles is not None and 'system_admin' in roles:
+    #         return True
+    #         return False
 
-    def __get_user_id_from_username(self, username):
-        # TODO duplicate
-        user_data = get_user(username)
-        return user_data.get("id")
+    # def get_user_id_from_username(self, username):
+    #     # TODO duplicate
+    #     user_data = get_user(username)
+    #     return user_data.get("id")
 
 
 class AskConfirmationResponse(Response):
     def __init__(self, parameters):
         super(AskConfirmationResponse, self).__init__(parameters)
 
-    def __is_role_admin(self, sender_info):
+    def is_role_admin(self, sender_info):
         roles = sender_info.get('roles')
         if roles is not None and 'system_admin' in roles:
             return True
@@ -333,14 +341,14 @@ class AskConfirmationResponse(Response):
     def answer(self):
         sender_info = get_user_by_id(self.sender_user_id)
         answer = self.standard_answers["cannot_do"]
-        if self.__is_role_admin(sender_info):
+        if self.is_role_admin(sender_info):
             answer = self.standard_answers['confirmer'].format(self.command)
         self.bot.logger.info("reply sent : {}".format(answer))
         return answer
 
     def reply(self):
         sender_info = get_user_by_id(self.sender_user_id)
-        if self.__is_role_admin(sender_info):
+        if self.is_role_admin(sender_info):
             self.bot.set_state_for_user(
                 self.sender_user_id,
                 (self.channel_id, self.command))
@@ -369,3 +377,55 @@ class ExecuteConfirmationResponse(Response):
                 if reaction_response_class is not None:
                     answer = reaction_response_class(self.parameters).answer()
         return answer
+
+
+class DeletePostResponse(Response):
+    def __init__(self, parameters):
+        super(DeletePostResponse, self).__init__(parameters)
+
+    def reply(self):
+        sender_info = get_user_by_id(self.sender_user_id)
+        post_to_delete = self.command.split("delete_this_post")[1].strip()
+        if not self.is_role_admin(sender_info):
+            if VERBOSE:
+                print("\n######## DeletePostResponse : must be deleted")
+            delete_this_post(self.post_id)
+        return self.answer()
+
+    def answer(self):
+        return
+
+
+class MuteResponse(Response):
+    def __init__(self, parameters):
+        super(MuteResponse, self).__init__(parameters)
+        self.duration = DEFAULT_MUTE_DURATION
+        self.stop_mute = False
+
+    def reply(self):
+        sender_info = get_user_by_id(self.sender_user_id)
+        if self.is_role_admin(sender_info):
+            try:
+                param = self.command.split('mute')[1].strip()
+                if param == "off":
+                    self.stop_mute = True
+                else:
+                    self.duration = int(param) * 60
+            except (ValueError, IndexError, AttributeError) as e:
+                if VERBOSE:
+                    print(repr(e))
+            if self.stop_mute:
+                self.bot.set_mode('normal')
+            else:
+                self.bot.set_mode("mute", param={
+                    "duration": timedelta(seconds=self.duration),
+                    "channel_id": self.channel_id
+                })
+            return self.answer()
+
+    def answer(self):
+        if self.stop_mute:
+            return self.standard_answers['mute_off']
+        else:
+            return self.standard_answers["mute_channel"].format(
+                self.duration // 60)
