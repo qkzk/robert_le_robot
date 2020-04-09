@@ -59,6 +59,9 @@ class Post:
                     print("OWN MESSAGE READED, SKIP")
                     return
 
+            self.__bot.logger.info(
+                "read a post : user_id {} - team_id {} - content {}".format(
+                    self.__sender_user_id, self.__team_id, message_content))
             if VERBOSE:
                 print("message_content", message_content)
                 print("team_id", self.__team_id)

@@ -18,6 +18,8 @@ from display_classroom_courses import PATH_CREDENTIALS
 
 from display_teams import display_teams
 
+from logging_system import logger
+
 PATH_ASSOCIATION = './config/association.yml'
 PATH_TEAM_CLASSROOM = './config/team_classroom.yml'
 PATH_BACKUP = './config/team_classroom_backup.yml'
@@ -91,6 +93,7 @@ def associate_team_classroom():
         copy_associations()
         print("Le fichier enregistré sera maintenant utilisé par robert_le_robot")
         print("Votre précédent fichier est conservé en backup")
+        logger.info("Associations saved to config file")
     return association
 
 

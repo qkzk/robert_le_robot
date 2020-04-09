@@ -42,6 +42,7 @@ class Response:
 
     def reply(self):
         answer = self.answer()
+        self.bot.logger.info("reply sent : {}".format(answer))
         self.bot.delete_state_for_user(self.sender_user_id)
         return answer
 
@@ -331,9 +332,11 @@ class AskConfirmationResponse(Response):
 
     def answer(self):
         sender_info = get_user_by_id(self.sender_user_id)
+        answer = self.standard_answers["cannot_do"]
         if self.__is_role_admin(sender_info):
-            return self.standard_answers['confirmer'].format(self.command)
-        return self.standard_answers["cannot_do"]
+            answer = self.standard_answers['confirmer'].format(self.command)
+        self.bot.logger.info("reply sent : {}".format(answer))
+        return answer
 
     def reply(self):
         sender_info = get_user_by_id(self.sender_user_id)

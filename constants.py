@@ -5,6 +5,8 @@ PATH_TOKEN_BOT = "./config/token.robert"
 PATH_OPTIONS_SERVER = "./config/server_options.yml"
 PATH_STANDARD_ANSWERS = './responses/standard_answers.yml'
 PATH_TEAM_CLASSROOM = './config/team_classroom.yml'
+# globals
+PATH_LOGFILE = './log/robert.log'
 
 # key words
 START_COMMAND = "!robert "

@@ -9,6 +9,8 @@ from constants import VERBOSE
 from mattermost_api import create_driver
 from mattermost_api import driver_create_login_get_info
 
+from logging_system import logger
+
 from utils import write_to_file
 from utils import read_from_file
 
@@ -39,15 +41,20 @@ A l'heure actuelle il peut :
 * tenter d'évaluer une expression latex
 '''.format(__title__, __author__, __date__)
 
+LOG_LOGIN_LOGOUT = "./log/robert.log"
+
 
 class Robert:
     def __init__(self):
-        self.__driver, self.__id, self.__username = driver_create_login_get_info()
+        self.logger = logger
         self.__state = {}
+        self.__driver, self.__id, self.__username = driver_create_login_get_info()
 
         if VERBOSE:
             print("\n###############################################\n")
             print("start async message_handler")
+
+        self.logger.info("init websocket")
         self.__driver.init_websocket(self.__message_handler)
 
     def id(self):

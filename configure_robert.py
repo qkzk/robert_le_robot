@@ -2,6 +2,7 @@ from associate_teams_courses import associate_team_classroom
 from mattermost_api import add_bot_to_all_teams
 from mattermost_api import add_bot_all_channels
 from utils import write_to_file
+from logging_system import logger
 
 PATH_TOKEN = './config/token.robert'
 PATH_OPTION = './config/server_options.yml'
@@ -64,6 +65,7 @@ def configure_robert():
     print(MESSAGE_CONNECT_CLASSROOM)
     associate_team_classroom()
     print(MESSAGE_END)
+    logger.info("Configuration done")
 
 
 def ask_input(text):
