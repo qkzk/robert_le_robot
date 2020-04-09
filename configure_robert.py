@@ -30,6 +30,7 @@ Voici les étapez à suivre :
     C'est indispensable pour les options de modération. Il fonctionnera toujours
     sans cela, mais vous ne pourrez pas lui demander d'effacer de messages ou de
     nettoyer un canal.
+6. Autorisez les webhooks (au moins entrant) : Menu Principal > Intégration > Autoriser les webhooks entrants
 
 Quand c'est fait, appuyez sur entrée pour passer à l'étape suivante.
 '''

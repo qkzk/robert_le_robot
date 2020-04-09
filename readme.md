@@ -32,7 +32,7 @@ Il reconnait aussi la syntaxe latex :
 
 \`\`\`latex
 ```latex
-\sum i={1}^{100} \frac{1}{2^i}
+\sum _{i=1}^{100} \frac{1}{2^i}
 ```
 \`\`\`
 
@@ -50,7 +50,7 @@ Il reconnait aussi la syntaxe latex :
 Il faut d'abord autoriser la création de bots.
 L'aide de Mattermost [ici](https://docs.mattermost.com/developer/bot-accounts.html)  et [là](https://docs.mattermost.com/developer/bot-accounts.html#bot-account-creation) explique comment créer un bot.
 
-~Il faut aussi autoriser [création de webhook](https://docs.mattermost.com/developer/webhooks-outgoing.html),~
+Il faut aussi autoriser [création de webhook](https://docs.mattermost.com/developer/webhooks-outgoing.html),
 
 qui permettent au bot de lire les messages d'un canal.
 
