@@ -36,7 +36,6 @@ L'objectif de Robert est d'apporter un peu de facilité aux enseignants et aux
     :one: kebab\
     :two: sushis
 
-* [ ] d'autres idées... parmi lesquelles : exécuter un script python, "panic mode : révoquer toutes les sessions", nettoyer tous les posts ayant plus de tel age dans la bdd, rendre silencieux un utilisateur,
 * [ ] **`!robert progression 3`** : permet aux élèves de valider les étapes d'un travail en validant des réactions
 
     Quelles étapes avez-vous réussies ?
@@ -58,6 +57,7 @@ L'objectif de Robert est d'apporter un peu de facilité aux enseignants et aux
     16
     25
     ```
+* [ ] d'autres idées... parmi lesquelles : exécuter un script python, "panic mode : révoquer toutes les sessions", nettoyer tous les posts ayant plus de tel age dans la bdd, rendre silencieux un utilisateur,
 
 Il reconnait aussi la syntaxe latex :
 
