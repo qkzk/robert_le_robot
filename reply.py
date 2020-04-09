@@ -15,7 +15,8 @@ from pprint import pprint
 
 from constants import VERBOSE
 
-from mattermost_api import driver_create
+from mattermost_api import create_post
+from mattermost_api import add_reaction
 
 from responses import Response
 from responses import DateResponse
@@ -95,7 +96,7 @@ class Reply:
                 self.__mattermost_answer = create_post(self.__post_options)
                 if VERBOSE:
                     print('\nReply sent')
-                self.__response.followup(mattermost_answer)
+                self.__response.followup(self.__mattermost_answer)
             else:
                 if VERBOSE:
                     print("\nbot_replies : answer is None. Nothing sent.")
