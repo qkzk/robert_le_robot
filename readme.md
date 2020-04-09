@@ -21,9 +21,11 @@ Il peut répondre à différentes commandes.
 * [x] **`!robert python {nom_d_objet}`** : affiche l'aide d'un objet **python**,
 * [x] **`!robert latex {syntaxe latex}`** : tente d'évaluer une commande **latex**. La valeur est arrondie après 4 décimales.
 * [x] **`!robert travail [nombre]`** (**`nombre`** est optionnel) : affiche une brève description des derniers travaux déposés sur classroom.
-* [x] **`!robert session \@username`** : affiche des infos sur le compte : dernière connexion etc. (_System Admin Only_)
+* [x] **`!robert session username`** : affiche des infos sur le compte : dernière connexion etc. (_System Admin Only_)
 * [x] **`!robert clear`** : efface tous les messages d'un canal. Demande une confirmation par `!robert confirmer` (_System Admin Only_)
-* [x] **`!robert delete @username`** : efface tous les messages d'un utilisateur sur les canaux publics auxquel il a accès. Demande une confirmation par `!robert confirmer` (_System Admin Only_)
+* [x] **`!robert delete username`** : efface tous les messages d'un utilisateur sur les canaux publics auxquel il a accès. Demande une confirmation par `!robert confirmer` (_System Admin Only_)
+* [x] **`!robert session username`** : affiche toutes les sessions d'un utilisateur. (_System Admin Only_)
+* [x] **`!robert mute [durée/off]`** : empêche les utilisateurs de s'exprimer sur un canal. S'arrête après une durée par défaut. (_System Admin Only_)
 * [ ] d'autres idées... parmi lesquelles : exécuter un script python, "panic mode : révoquer toutes les sessions", nettoyer tous les posts ayant plus de tel age dans la bdd, rendre silencieux un utilisateur,
 
 Il reconnait aussi la syntaxe latex :
