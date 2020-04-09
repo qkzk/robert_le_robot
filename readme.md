@@ -47,9 +47,11 @@ Il reconnait aussi la syntaxe latex :
 
 ## Créer un bot pour mattermost
 
+Il faut d'abord autoriser la création de bots.
 L'aide de Mattermost [ici](https://docs.mattermost.com/developer/bot-accounts.html)  et [là](https://docs.mattermost.com/developer/bot-accounts.html#bot-account-creation) explique comment créer un bot.
 
-Il faut d'abord autoriser la création de bots ainsi que [celles de webhook](https://docs.mattermost.com/developer/webhooks-outgoing.html),
+~Il faut aussi autoriser [création de webhook](https://docs.mattermost.com/developer/webhooks-outgoing.html),~
+
 qui permettent au bot de lire les messages d'un canal.
 
 **Robert** répond à la fois aux messages privés et aux messages publics sur un canal.

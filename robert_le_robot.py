@@ -56,10 +56,6 @@ class Robert:
         self.logger.info("init websocket")
         self.channel_ids = get_all_channels()
         self.channel_mode = self.default_mode()
-        # self.set_mode("normal")
-        # self.set_mode("mute", param={
-        #     "duration": timedelta(seconds=DEFAULT_MUTE_DURATION),
-        #     "channel_id": "rkrfn5yeob8zijd9tb5rfq9j3e"})
 
         if VERBOSE:
             print("\n###############################################\n")
