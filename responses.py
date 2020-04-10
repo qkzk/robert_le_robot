@@ -144,7 +144,7 @@ class PythonResponse(Response):
             print("help_seeked_on", help_seeked_on)
         try:
             answer = pydoc.render_doc(help_seeked_on,
-                                      standard_answers['python_doc'],
+                                      self.standard_answers['python_doc'],
                                       renderer=pydoc.plaintext)[:16383]
         except ImportError as e:
             answer = self.standard_answers['python_no_doc'].format(help_seeked_on)
