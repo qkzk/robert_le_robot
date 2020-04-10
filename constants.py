@@ -18,3 +18,8 @@ DATETIME_FORMAT = "La date est %Y-%m-%d et il est %H:%M"
 LOG_FORMAT = '%(asctime)s %(levelname)s %(pathname)s %(funcName)s(%(lineno)d) %(message)s'
 
 DEFAULT_MUTE_DURATION = 60
+
+EMOJI_NUMBERS = ['zero', 'one', 'two', 'three', 'four', 'five',
+                 'six', 'seven', 'eight', 'nine', 'ten']
+EMOJIS_YES_NO = {"oui": "green_heart",
+                 "non": "red_circle"}

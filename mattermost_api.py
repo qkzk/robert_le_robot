@@ -204,6 +204,20 @@ def add_reaction(options):
     driver.reactions.create_reaction(options=options)
 
 
+def add_reaction_list(post_id, bot_id, emojis_list, limit=None):
+    if limit is not None:
+        emojis_list = emojis_list[:limit]
+    for emoji in emojis_list:
+        add_reaction(
+            {
+                "user_id": bot_id,
+                "post_id": post_id,
+                "emoji_name": emoji,
+                "create_at": 0
+            }
+        )
+
+
 def delete_this_post(post_id):
     driver = driver_create_login()
     driver.posts.delete_post(post_id)

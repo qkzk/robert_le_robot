@@ -33,6 +33,8 @@ from responses import ExecuteConfirmationResponse
 from responses import DeletePostResponse
 from responses import MuteResponse
 from responses import PollResponse
+from responses import UnderstoodResponse
+from responses import StepResponse
 
 
 class Reply:
@@ -78,6 +80,8 @@ class Reply:
             'delete_this_post': DeletePostResponse,
             'mute': MuteResponse,
             'poll': PollResponse,
+            'compris': UnderstoodResponse,
+            'step': StepResponse,
         }
         return reactions
 

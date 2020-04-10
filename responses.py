@@ -10,6 +10,8 @@ from classroom_api import retrieve_parse_works
 
 from constants import DATETIME_FORMAT
 from constants import DEFAULT_MUTE_DURATION
+from constants import EMOJI_NUMBERS
+from constants import EMOJIS_YES_NO
 from constants import PATH_TEAM_CLASSROOM
 from constants import VERBOSE
 
@@ -17,6 +19,7 @@ from utils import get_standard_answers, read_yaml_file
 
 from mattermost_api import create_post
 from mattermost_api import add_reaction
+from mattermost_api import add_reaction_list
 from mattermost_api import delete_posts_from_list_id
 from mattermost_api import delete_this_post
 from mattermost_api import get_all_posts_from_username
@@ -395,19 +398,8 @@ class PollResponse(Response):
         self.poll_question = self.get_poll_options()[0]
         self.poll_options = self.get_poll_options()[2::2]
         self.number_options = len(self.poll_options)
-        self.emoji_numbers = {
-            0: 'zero',
-            1: 'one',
-            2: 'two',
-            3: 'three',
-            4: 'four',
-            5: 'five',
-            6: 'six',
-            7: 'seven',
-            8: 'eight',
-            9: 'nine',
-            10: 'ten',
-        }
+        self.emoji_numbers = EMOJI_NUMBERS
+
         self.can_create_poll = True
 
     def get_poll_options(self):
@@ -448,12 +440,55 @@ class PollResponse(Response):
         if self.can_create_poll:
             post_id = mattermost_answer.get("id")
             bot_id = self.bot.id()
-            for index in range(len(self.poll_options)):
-                add_reaction(
-                    {
-                        "user_id": bot_id,
-                        "post_id": post_id,
-                        "emoji_name": self.emoji_numbers[index],
-                        "create_at": 0
-                    }
-                )
+            add_reaction_list(post_id,
+                              bot_id,
+                              self.emoji_numbers,
+                              limit=len(self.poll_options))
+
+
+class UnderstoodResponse(Response):
+    def __init__(self, parameters):
+        super(UnderstoodResponse, self).__init__(parameters)
+        self.emojis = emojis_yes_no
+
+    def answer(self):
+        question = self.command.split("compris")[1].strip()
+        text = self.standard_answers['understood']
+        text += " " + str(question)
+        for k, v in self.emojis.items():
+            text += '\n:' + v + ': ' + k
+        return text
+
+    def followup(self, mattermost_answer):
+        post_id = mattermost_answer.get("id")
+        bot_id = self.bot.id()
+        add_reaction_list(post_id, bot_id, list(self.emojis.values()))
+
+
+class StepResponse(Response):
+    def __init__(self, parameters):
+        super(StepResponse, self).__init__(parameters)
+        self.emojis = EMOJI_NUMBERS[1:]
+        self.steps = 10
+        self.abort = False
+
+    def answer(self):
+        try:
+            self.steps = int(self.command.split("step")[1].strip())
+            if self.steps > 9:
+                self.abort = True
+                return
+        except (ValueError, TypeError):
+            self.abort = True
+            return
+        text = self.standard_answers['steps']
+        return text
+
+    def followup(self, mattermost_answer):
+        if not self.abort:
+            post_id = mattermost_answer.get("id")
+            bot_id = self.bot.id()
+            add_reaction_list(post_id,
+                              bot_id,
+                              self.emojis,
+                              limit=self.steps)
