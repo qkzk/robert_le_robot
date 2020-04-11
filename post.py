@@ -117,7 +117,7 @@ class Post:
             print("sender is not admin ? ", is_sender_admin)
         if is_muted_channel and not is_sender_admin:
             return True
-            return False
+            # return False
 
     def __post_to_delete(self, muted_channel, sender_infos):
         return self.__channel_id is not None \

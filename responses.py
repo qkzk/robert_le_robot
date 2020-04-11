@@ -449,7 +449,7 @@ class PollResponse(Response):
 class UnderstoodResponse(Response):
     def __init__(self, parameters):
         super(UnderstoodResponse, self).__init__(parameters)
-        self.emojis = emojis_yes_no
+        self.emojis = EMOJIS_YES_NO
 
     def answer(self):
         question = self.command.split("compris")[1].strip()

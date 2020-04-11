@@ -61,11 +61,11 @@ class Reply:
         self.__reply_parameters = None
         self.__post_options = None
 
-        self.__keywords_reactions = self.__define_reactions()
+        self.__keywords_reactions = self.__keyword_reactions()
         self.__response = Response
         self.__mattermost_answer = None
 
-    def __define_reactions(self):
+    def __keyword_reactions(self):
         reactions = {
             'travail': ClassroomResponse,
             'help': HelpResponse,
@@ -91,7 +91,7 @@ class Reply:
             print("bot_replies")
         if self.__channel_id is not None:
             self.__reply_parameters = self.__create_parameters()
-            self.__post_options = self.__create_options()
+            self.__post_options = self.__pick_response()
 
             if VERBOSE:
                 print("\nmsg_options")
@@ -116,7 +116,7 @@ class Reply:
             "post_id": self.__post_id,
         }
 
-    def __create_options(self):
+    def __pick_response(self):
         '''choisit la bonne réaction et construit la réponse du bot'''
         if VERBOSE:
             print("\n##############################################\n")
