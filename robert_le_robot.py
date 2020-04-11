@@ -45,8 +45,6 @@ A l'heure actuelle il peut :
 * tenter d'évaluer une expression latex
 '''.format(__title__, __author__, __date__)
 
-LOG_LOGIN_LOGOUT = "./log/robert.log"
-
 
 class Robert:
     def __init__(self):

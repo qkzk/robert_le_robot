@@ -55,9 +55,6 @@ class Response:
     def answer(self):
         return ''
 
-    def create_message(self):
-        return ''
-
     def update_sender_status(self, user_id):
         self.bot.delete_state_for_user(user_id)
 
