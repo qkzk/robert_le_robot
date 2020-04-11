@@ -38,7 +38,7 @@ class Post:
                 if VERBOSE:
                     print('classmethod : Post from_json')
                     pprint(msg_json_data_post)
-                return Post(bot, msg_json_data_post, team_id)
+                return cls(bot, msg_json_data_post, team_id)
 
     def parse_post(self):
         '''
