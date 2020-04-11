@@ -1,4 +1,4 @@
-VERBOSE = True
+VERBOSE = False
 
 # Files
 PATH_TOKEN_BOT = "./config/token.robert"

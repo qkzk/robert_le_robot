@@ -160,17 +160,17 @@ class Post:
         return {
             "bot": self.__bot,
             "command": self.__command,
+            "latex_syntax": self.__latex_syntax,
             "sender_user_id": self.__sender_user_id,
             "channel_id": self.__channel_id,
             "team_id": self.__team_id,
-            "latex_syntax": self.__latex_syntax,
-            "post_id": self.__post_id,
             "post_id": self.__post_id,
             "delete_post": self.__delete_post
         }
 
     def reply(self):
         if self.__deal_answer:
+            self.__bot.logger.info("Post deal command: " + self.__command)
             parameters = self.__create_parameters()
             reply = Reply(parameters)
             reply.bot_replies()

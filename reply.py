@@ -32,42 +32,35 @@ from responses import StepResponse
 
 
 class Reply:
-    '''choose the corrrect reaction'''
+    '''choose the corrrect response from the bot'''
+
+    __keywords_responses = {
+        'travail': ClassroomResponse,
+        'help': HelpResponse,
+        'date': DateResponse,
+        'python': PythonResponse,
+        'latex': LatexResponse,
+        'session': SessionResponse,
+        'clear': AskConfirmationResponse,
+        'delete': AskConfirmationResponse,
+        'demander': AskConfirmationResponse,
+        'confirmer': ExecuteConfirmationResponse,
+        'delete_this_post': DeletePostResponse,
+        'mute': MuteResponse,
+        'poll': PollResponse,
+        'compris': UnderstoodResponse,
+        'step': StepResponse,
+    }
 
     def __init__(self, parameters):
         self.__parameters = parameters
-
-        self.__keywords_reactions = self.__keyword_reactions()
         self.__response_class = Response
         self.__response_object = None
-
-    def __keyword_reactions(self):
-        return {
-            'travail': ClassroomResponse,
-            'help': HelpResponse,
-            'date': DateResponse,
-            'python': PythonResponse,
-            'latex': LatexResponse,
-            'session': SessionResponse,
-            'clear': AskConfirmationResponse,
-            'delete': AskConfirmationResponse,
-            'demander': AskConfirmationResponse,
-            'confirmer': ExecuteConfirmationResponse,
-            'delete_this_post': DeletePostResponse,
-            'mute': MuteResponse,
-            'poll': PollResponse,
-            'compris': UnderstoodResponse,
-            'step': StepResponse,
-        }
-
-    def bot_replies(self):
-        if VERBOSE:
-            print("\n##############################################\n")
-            print("bot_replies")
-
         if self.__parameters["channel_id"] is not None:
             self.__response_object = self.__choose_response()
-            self.__response_object.bot_response()
+            self.__parameters["bot"].logger.info(
+                "response class chosen: " +
+                type(self.__response_object).__name__)
 
     def __choose_response(self):
         '''choisit la bonne réaction et construit la réponse du bot'''
@@ -78,7 +71,7 @@ class Reply:
         command_words = self.__parameters["command"].split(' ')
 
         keyword = command_words[0].lower()
-        self.__response_class = self.__keywords_reactions.get(keyword)
+        self.__response_class = self.__keywords_responses.get(keyword)
 
         if self.__response_class is None:
             if VERBOSE:
@@ -93,3 +86,11 @@ class Reply:
                 self.__response_class = CannotdoResponse
 
         return self.__response_class(self.__parameters)
+
+    def bot_replies(self):
+        if VERBOSE:
+            print("\n##############################################\n")
+            print("bot_replies")
+
+        if self.__parameters["channel_id"] is not None:
+            self.__response_object.bot_response()
