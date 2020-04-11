@@ -48,30 +48,56 @@ class Response:
         self.latex_syntax = parameters["latex_syntax"]
         self.post_id = parameters["post_id"]
 
+        self.message = None
+        self.payload = None
+        self.mattermost_answer = None
+
     def answer(self):
         return ''
 
-    def reply(self):
-        answer = self.answer()
-        self.bot.logger.info("reply sent : {}".format(answer))
-        self.bot.delete_state_for_user(self.sender_user_id)
-        return answer
+    def create_message(self):
+        return ''
 
-    def followup(self, mattermost_answer):
+    def update_sender_status(self, user_id):
+        self.bot.delete_state_for_user(user_id)
+
+    def create_payload(self):
+        if self.message is not None:
+            return {
+                'channel_id': self.channel_id,
+                'message': self.message,
+            }
+
+    def create_options(self):
+        self.message = self.answer()
+        self.bot.logger.info("reply sent : {}".format(self.message))
+        self.payload = self.create_payload()
+
+    def custom_reaction(self):
+        pass
+
+    def bot_response(self):
+        # custom_class
+        self.custom_reaction()
+        # options
+        self.create_options()
+        # action
+        if self.payload is not None:
+            self.mattermost_answer = create_post(self.payload)
+        self.update_sender_status(self.sender_user_id)
+        self.followup()
+
+    def followup(self):
         pass
 
 
 class CannotdoResponse(Response):
-    def __init__(self, parameters):
-        super(CannotdoResponse, self).__init__(parameters)
 
     def answer(self):
         return self.standard_answers["cannot_do"]
 
 
 class HelpResponse(Response):
-    def __init__(self, parameters):
-        super(HelpResponse, self).__init__(parameters)
 
     def answer(self):
         text = self.standard_answers["help"]
@@ -82,8 +108,6 @@ class HelpResponse(Response):
 
 
 class ClassroomResponse(Response):
-    def __init__(self, parameters):
-        super(ClassroomResponse, self).__init__(parameters)
 
     def answer(self):
         if VERBOSE:
@@ -124,8 +148,6 @@ class ClassroomResponse(Response):
 
 
 class DateResponse(Response):
-    def __init__(self, parameters):
-        super(DateResponse, self).__init__(parameters)
 
     def answer(self):
         now = datetime.now()
@@ -133,8 +155,6 @@ class DateResponse(Response):
 
 
 class PythonResponse(Response):
-    def __init__(self, parameters):
-        super(PythonResponse, self).__init__(parameters)
 
     def answer(self):
         '''
@@ -155,8 +175,6 @@ class PythonResponse(Response):
 
 
 class LatexResponse(Response):
-    def __init__(self, parameters):
-        super(LatexResponse, self).__init__(parameters)
 
     def answer(self):
         if not self.latex_syntax:
@@ -191,52 +209,47 @@ class LatexResponse(Response):
 
 
 class SessionResponse(Response):
-
     FORMAT_SESSION_DATE = "le %Y-%m-%d à %H:%M"
-
-    def __init__(self, parameters):
-        super(SessionResponse, self).__init__(parameters)
 
     def answer(self):
         sender_info = get_user_by_id(self.sender_user_id)
-        is_admin = is_user_admin(self.sender_user_id)
-
-        if is_admin:
+        if is_user_admin(self.sender_user_id):
             user_asked_about = self.command.split("session")[1].strip()
             try:
                 user_id_asked_about = get_user_id_from_username(
                     user_asked_about)
 
                 sessions = get_user_sessions_from_api(user_id_asked_about)
-                answer = self.__format_session_from_api(sessions,
-                                                        user_asked_about)
-                if answer == "":
-                    answer = self.standard_answers['invalid_user']
+                message = self.__format_session_from_api(sessions,
+                                                         user_asked_about)
+                if message == "":
+                    message = self.standard_answers['invalid_user']
             except Exception as e:
                 print("\nException raised while asking sessions\n")
                 print(repr(e))
-                answer = self.standard_answers['invalid_user']
+                message = self.standard_answers['invalid_user']
         else:
             if VERBOSE:
                 print("Permission denied for {0}".format(self.sender_user_id))
-            logger.info("Permission denied for {0}".format(self.sender_user_id))
-            answer = self.standard_answers['cannot_do']
-        return answer
+            self.bot.logger.info("Permission denied for {0}".format(
+                self.sender_user_id))
+            message = self.standard_answers['cannot_do']
+        return message
 
     def __format_session_from_api(self, sessions, username):
         answer = ''
         for session in sessions:
-            answer = self.__format_session_text(answer, session, username)
+            answer = self.__format_session_line(answer, session, username)
         return answer
 
-    def __format_session_text(self, answer, session, username):
+    def __format_session_line(self, answer, session, username):
         create_at = datetime.fromtimestamp(session.get('create_at') // 1000)
         last_activity_at = datetime.fromtimestamp(
             session.get('last_activity_at') // 1000)
 
-        answer += standard_answers['session_start'].format(username)
+        answer += self.standard_answers['session_start'].format(username)
         answer += datetime.strftime(create_at, self.FORMAT_SESSION_DATE)
-        answer += standard_answers['session_end']
+        answer += self.standard_answers['session_end']
         answer += datetime.strftime(last_activity_at, self.FORMAT_SESSION_DATE)
         answer += '\n'
         return answer
@@ -246,15 +259,15 @@ class SessionResponse(Response):
 
 
 class ClearResponse(Response):
-    def __init__(self, parameters):
-        super(ClearResponse, self).__init__(parameters)
 
     def answer(self):
+        if VERBOSE:
+            print("\nClearResponse answer\n")
         sender_info = get_user_by_id(self.sender_user_id)
         if is_user_admin(self.sender_user_id):
             self.__clear_channel()
         else:
-            logger.info("Permission denied for {0}".format(self.sender_user_id))
+            self.bot.logger.info("Permission denied for {0}".format(self.sender_user_id))
             return self.standard_answers["cannot_do"]
 
     def __clear_channel(self):
@@ -263,8 +276,6 @@ class ClearResponse(Response):
 
 
 class DeteleResponse(Response):
-    def __init__(self, parameters):
-        super(DeteleResponse, self).__init__(parameters)
 
     def answer(self):
         sender_info = get_user_by_id(self.sender_user_id)
@@ -298,22 +309,24 @@ class DeteleResponse(Response):
 class AskConfirmationResponse(Response):
     def __init__(self, parameters):
         super(AskConfirmationResponse, self).__init__(parameters)
+        self.sender_is_admin = is_user_admin(self.sender_user_id)
 
     def answer(self):
         sender_info = get_user_by_id(self.sender_user_id)
-        answer = self.standard_answers["cannot_do"]
-        if is_user_admin(self.sender_user_id):
-            answer = self.standard_answers['confirmer'].format(self.command)
-        self.bot.logger.info("reply sent : {}".format(answer))
-        return answer
+        message = self.standard_answers["cannot_do"]
+        if self.sender_is_admin:
+            message = self.standard_answers['confirmer'].format(self.command)
+        self.bot.logger.info("reply sent : {}".format(message))
+        return message
 
-    def reply(self):
+    def update_sender_status(self, user_id):
         sender_info = get_user_by_id(self.sender_user_id)
-        if is_user_admin(self.sender_user_id):
+        if self.sender_is_admin:
+            if VERBOSE:
+                print("\nAskConfirmationResponse custom reaction sent state\n")
             self.bot.set_state_for_user(
                 self.sender_user_id,
                 (self.channel_id, self.command))
-        return self.answer()
 
 
 class ExecuteConfirmationResponse(Response):
@@ -322,11 +335,13 @@ class ExecuteConfirmationResponse(Response):
         'delete': DeteleResponse,
     }
 
-    def __init__(self, parameters):
-        super(ExecuteConfirmationResponse, self).__init__(parameters)
-
     def answer(self):
+        if VERBOSE:
+            print("\ExecuteConfirmationResponse answer\n")
         bot_status = self.bot.get_state_for_user(self.sender_user_id)
+        if VERBOSE:
+            print("\ExecuteConfirmationResponse bot_status\n")
+            print(bot_status)
 
         answer = self.standard_answers["cannot_do"]
         if bot_status is not None and len(bot_status) > 1:
@@ -341,10 +356,8 @@ class ExecuteConfirmationResponse(Response):
 
 
 class DeletePostResponse(Response):
-    def __init__(self, parameters):
-        super(DeletePostResponse, self).__init__(parameters)
 
-    def reply(self):
+    def custom_reaction(self):
         sender_info = get_user_by_id(self.sender_user_id)
         post_to_delete = self.command.split("delete_this_post")[1].strip()
         if not is_user_admin(self.sender_user_id):
@@ -363,7 +376,7 @@ class MuteResponse(Response):
         self.duration = DEFAULT_MUTE_DURATION
         self.stop_mute = False
 
-    def reply(self):
+    def custom_reaction(self):
         is_sender_admin = is_user_admin(self.sender_user_id)
         if is_sender_admin:
             try:
@@ -381,7 +394,10 @@ class MuteResponse(Response):
                 self.bot.set_channel_mode(
                     self.channel_id,
                     True,
-                    param={"duration": timedelta(seconds=self.duration)})
+                    param={
+                        "duration": timedelta(seconds=self.duration),
+                        "date_muted": datetime.now()
+                    })
             return self.answer()
 
     def answer(self):
@@ -393,12 +409,14 @@ class MuteResponse(Response):
 
 
 class PollResponse(Response):
+
+    emoji_numbers = EMOJI_NUMBERS
+
     def __init__(self, parameters):
         super(PollResponse, self).__init__(parameters)
         self.poll_question = self.get_poll_options()[0]
         self.poll_options = self.get_poll_options()[2::2]
         self.number_options = len(self.poll_options)
-        self.emoji_numbers = EMOJI_NUMBERS
 
         self.can_create_poll = True
 
@@ -431,25 +449,24 @@ class PollResponse(Response):
             text = self.format_answers()
         return text
 
-    def followup(self, mattermost_answer):
+    def followup(self):
 
         if VERBOSE:
             print("\n ############### FOLLOWUP ###############\n")
-            print(mattermost_answer)
+            print(self.mattermost_answer)
             print("\n ############################## \n")
         if self.can_create_poll:
-            post_id = mattermost_answer.get("id")
-            bot_id = self.bot.id()
-            add_reaction_list(post_id,
-                              bot_id,
-                              self.emoji_numbers,
-                              limit=len(self.poll_options))
+            if self.mattermost_answer is not None:
+                post_id = self.mattermost_answer.get("id")
+                bot_id = self.bot.id()
+                add_reaction_list(post_id,
+                                  bot_id,
+                                  self.emoji_numbers,
+                                  limit=len(self.poll_options))
 
 
 class UnderstoodResponse(Response):
-    def __init__(self, parameters):
-        super(UnderstoodResponse, self).__init__(parameters)
-        self.emojis = EMOJIS_YES_NO
+    emojis = EMOJIS_YES_NO
 
     def answer(self):
         question = self.command.split("compris")[1].strip()
@@ -459,16 +476,18 @@ class UnderstoodResponse(Response):
             text += '\n:' + v + ': ' + k
         return text
 
-    def followup(self, mattermost_answer):
-        post_id = mattermost_answer.get("id")
-        bot_id = self.bot.id()
-        add_reaction_list(post_id, bot_id, list(self.emojis.values()))
+    def followup(self):
+        if self.mattermost_answer is not None:
+            post_id = self.mattermost_answer.get("id")
+            bot_id = self.bot.id()
+            add_reaction_list(post_id, bot_id, list(self.emojis.values()))
 
 
 class StepResponse(Response):
+    emojis = EMOJI_NUMBERS[1:]
+
     def __init__(self, parameters):
         super(StepResponse, self).__init__(parameters)
-        self.emojis = EMOJI_NUMBERS[1:]
         self.steps = 10
         self.abort = False
 
@@ -484,9 +503,9 @@ class StepResponse(Response):
         text = self.standard_answers['steps']
         return text
 
-    def followup(self, mattermost_answer):
-        if not self.abort:
-            post_id = mattermost_answer.get("id")
+    def followup(self):
+        if not self.abort and self.mattermost_answer is not None:
+            post_id = self.mattermost_answer.get("id")
             bot_id = self.bot.id()
             add_reaction_list(post_id,
                               bot_id,

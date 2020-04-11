@@ -16,11 +16,8 @@ from reply import Reply
 
 
 class Post:
-    # __bot_id = read_from_file(PATH_ID_BOT)
-
-    def __init__(self, bot, direct_order, msg_json_data_post, team_id):
+    def __init__(self, bot, msg_json_data_post, team_id):
         self.__bot = bot
-        self.__direct_order = direct_order
         self.__msg_json_data_post = msg_json_data_post
         self.__team_id = team_id
         self.__deal_answer = False
@@ -41,7 +38,7 @@ class Post:
                 if VERBOSE:
                     print('classmethod : Post from_json')
                     pprint(msg_json_data_post)
-                return Post(bot, None, msg_json_data_post, team_id)
+                return Post(bot, msg_json_data_post, team_id)
 
     def parse_post(self):
         '''
@@ -75,6 +72,13 @@ class Post:
                 print("message_content", self.__message_content)
                 print("team_id", self.__team_id)
 
+            channel_state = self.__bot.get_channel_mode(self.__channel_id)
+            if VERBOSE:
+                print("\n##################################")
+                print("\n\nPost : channel state\n\n")
+                print(channel_state)
+                print("mute ???", channel_state.get("mute"))
+                print("##################################\n")
             if self.__bot.get_channel_mode(self.__channel_id).get("mute"):
                 self.__check_back_normal_or_deleted()
 
@@ -87,23 +91,33 @@ class Post:
                 self.__check_command_and_reply()
 
     def __check_back_normal_or_deleted(self):
-        bot_mode = self.__bot.get_channel_mode(self.__channel_id)
-        duration = bot_mode.get("duration")
-        date_muted = bot_mode.get("date")
+        bot_channel_mode = self.__bot.get_channel_mode(self.__channel_id)
+        duration = bot_channel_mode.get("duration")
+        date_muted = bot_channel_mode.get("date_muted")
         now = datetime.now()
         back_to_normal = False
+        if VERBOSE:
+            print("\n##################################")
+            print("duration", duration)
+            print("date_muted", date_muted)
+            print("\n##################################")
         try:
             if now - date_muted > duration:
                 back_to_normal = True
             if VERBOSE:
                 seconds_spent = (now - date_muted).seconds
-                print("Post : muted since {} seconds".format(seconds_spent))
+                print("\n##################################")
+                print("\n\nPost : muted since {} seconds\n\n".format(seconds_spent))
+                print("##################################\n")
         except TypeError as e:
             if VERBOSE:
+                print("\n##################################")
+                print("\n\nPost : excetion check back\n\n")
                 print(repr(e))
+                print("##################################\n")
 
         if back_to_normal:
-            self.__bot.set_mode("normal")
+            self.__bot.set_channel_mode(self.__channel_id, False)
 
         else:
             self.__delete_post = self.__check_must_be_deleted()
@@ -114,10 +128,9 @@ class Post:
         is_sender_admin = is_user_admin(self.__sender_user_id)
         if VERBOSE:
             print("muted_channel ? ", is_muted_channel)
-            print("sender is not admin ? ", is_sender_admin)
+            print("sender is admin ? ", is_sender_admin)
         if is_muted_channel and not is_sender_admin:
             return True
-            # return False
 
     def __post_to_delete(self, muted_channel, sender_infos):
         return self.__channel_id is not None \
@@ -143,14 +156,21 @@ class Post:
             self.__deal_answer = True
         self.reply()
 
+    def __create_parameters(self):
+        return {
+            "bot": self.__bot,
+            "command": self.__command,
+            "sender_user_id": self.__sender_user_id,
+            "channel_id": self.__channel_id,
+            "team_id": self.__team_id,
+            "latex_syntax": self.__latex_syntax,
+            "post_id": self.__post_id,
+            "post_id": self.__post_id,
+            "delete_post": self.__delete_post
+        }
+
     def reply(self):
         if self.__deal_answer:
-            reply = Reply(self.__bot,
-                          self.__command,
-                          latex_syntax=self.__latex_syntax,
-                          sender_user_id=self.__sender_user_id,
-                          channel_id=self.__channel_id,
-                          team_id=self.__team_id,
-                          post_id=self.__post_id,
-                          delete_post=self.__delete_post)
+            parameters = self.__create_parameters()
+            reply = Reply(parameters)
             reply.bot_replies()

@@ -81,6 +81,8 @@ class Robert:
         self.__state = state
 
     def get_state_for_user(self, user_id):
+        if VERBOSE:
+            print("\nRobert : state asked")
         return self.__state.get(user_id)
 
     def set_state_for_user(self, user_id, state):
@@ -88,12 +90,15 @@ class Robert:
 
     def delete_state_for_user(self, user_id):
         if user_id in self.__state:
+            if VERBOSE:
+                print("\nRobert : state deleted for", user_id)
+                print(self.__state)
             del self.__state[user_id]
 
     def validation(self, user_id):
         if user_id in self.__state:
             command = self.__state[user_id]
-            post = Post(self, True, None, None)
+            post = Post(self, None, None)
             post.reply(command,
                        sender_user_id=user_id,
                        channel_id=channel_id)

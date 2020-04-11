@@ -10,13 +10,7 @@ func GetDMNameFromIds(userId1, userId2 string) string {
         return userId1 + "__" + userId2
     }
 '''
-from datetime import timedelta
-from pprint import pprint
-
 from constants import VERBOSE
-
-from mattermost_api import create_post
-from mattermost_api import add_reaction
 
 from responses import Response
 from responses import DateResponse
@@ -38,35 +32,17 @@ from responses import StepResponse
 
 
 class Reply:
-    def __init__(self,
-                 bot,
-                 command,
-                 latex_syntax=False,
-                 sender_user_id=None,
-                 channel_id=None,
-                 team_id=None,
-                 post_id=None,
-                 delete_post=False):
+    '''choose the corrrect reaction'''
 
-        self.__bot = bot
-        self.__command = command
-        self.__latex_syntax = latex_syntax
-        self.__channel_id = channel_id
-        self.__team_id = team_id
-        self.__post_id = post_id
-        self.__sender_user_id = sender_user_id
-        self.__delete_post = delete_post
-
-        self.__driver = None
-        self.__reply_parameters = None
-        self.__post_options = None
+    def __init__(self, parameters):
+        self.__parameters = parameters
 
         self.__keywords_reactions = self.__keyword_reactions()
-        self.__response = Response
-        self.__mattermost_answer = None
+        self.__response_class = Response
+        self.__response_object = None
 
     def __keyword_reactions(self):
-        reactions = {
+        return {
             'travail': ClassroomResponse,
             'help': HelpResponse,
             'date': DateResponse,
@@ -83,46 +59,23 @@ class Reply:
             'compris': UnderstoodResponse,
             'step': StepResponse,
         }
-        return reactions
 
     def bot_replies(self):
         if VERBOSE:
             print("\n##############################################\n")
             print("bot_replies")
-        if self.__channel_id is not None:
-            self.__reply_parameters = self.__create_parameters()
-            self.__post_options = self.__pick_response()
 
-            if VERBOSE:
-                print("\nmsg_options")
-                pprint(self.__post_options)
-            if self.__post_options.get('message') is not None:
-                self.__mattermost_answer = create_post(self.__post_options)
-                if VERBOSE:
-                    print('\nReply sent')
-                self.__response.followup(self.__mattermost_answer)
-            else:
-                if VERBOSE:
-                    print("\nbot_replies : answer is None. Nothing sent.")
+        if self.__parameters["channel_id"] is not None:
+            self.__response_object = self.__choose_response()
+            self.__response_object.bot_response()
 
-    def __create_parameters(self):
-        return {
-            "bot": self.__bot,
-            "command": self.__command,
-            "sender_user_id": self.__sender_user_id,
-            "channel_id": self.__channel_id,
-            "team_id": self.__team_id,
-            "latex_syntax": self.__latex_syntax,
-            "post_id": self.__post_id,
-        }
-
-    def __pick_response(self):
+    def __choose_response(self):
         '''choisit la bonne réaction et construit la réponse du bot'''
         if VERBOSE:
             print("\n##############################################\n")
-            print("bot_command_options received", self.__command)
+            print("bot_command_options received", self.__parameters["command"])
 
-        command_words = self.__command.split(' ')
+        command_words = self.__parameters["command"].split(' ')
 
         keyword = command_words[0].lower()
         self.__response_class = self.__keywords_reactions.get(keyword)
@@ -131,7 +84,7 @@ class Reply:
             if VERBOSE:
                 print("\n##############################################\n")
                 print("command_words", command_words)
-            if self.__latex_syntax:
+            if self.__parameters["latex_syntax"]:
                 if VERBOSE:
                     print("\n##############################################\n")
                     print("Latex Syntax received")
@@ -139,9 +92,4 @@ class Reply:
             else:
                 self.__response_class = CannotdoResponse
 
-        self.__response = self.__response_class(self.__reply_parameters)
-
-        return {
-            'channel_id': self.__channel_id,
-            'message': self.__response.reply(),
-        }
+        return self.__response_class(self.__parameters)
