@@ -170,17 +170,19 @@ def get_all_channels():
 def get_post_for_channel(channel_id):
     driver = driver_create_login()
     posts = driver.channels.get_posts(channel_id)
-    print("\n channel post ids :")
-    print("\nposts for channel {}".format(channel_id))
-    print(posts['order'])
+    if VERBOSE:
+        print("\n channel post ids :")
+        print("\nposts for channel {}".format(channel_id))
+        print(posts['order'])
     return posts['order']
 
 
 def get_ids_from_posts(posts):
     posts_ids = [post['id'] for post in posts]
-    print("\n get ids from posts")
-    print("the first ids i got are : ")
-    print(posts_ids[:100])
+    if VERBOSE:
+        print("\n get ids from posts")
+        print("the first ids i got are : ")
+        print(posts_ids[:100])
     return posts_ids
 
 
