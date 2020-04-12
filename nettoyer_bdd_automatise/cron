@@ -1,0 +1,5 @@
+# tous les mois, exécuter le script en question
+0 0 1 * * sudo /usr/bin/python3 /home/quentin/nettoyer_bdd_automatise/nettoyer_bdd_automatise.py
+
+# pour tester : toutes les minutes
+* * * * * sudo /usr/bin/python3 /home/quentin/nettoyer_bdd_automatise/nettoyer_bdd_automatise.py
