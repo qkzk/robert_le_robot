@@ -30,6 +30,8 @@ from classroom_courses import my_courses
 from constants import PATH_STANDARD_ANSWERS
 from utils import get_standard_answers
 
+from constants import VERBOSE
+
 # If modifying these scopes, delete the file token.pickle.
 # SCOPES = ['https://www.googleapis.com/auth/classroom.courses.readonly']
 # https://www.googleapis.com/auth/classroom.courses
@@ -210,8 +212,19 @@ def format_work_mattermost(work_simplified=None):
 
     title = work_simplified.get('title')
     url = work_simplified.get('url')
-    updateTime = datetime.strptime(work_simplified.get('updateTime'),
-                                   '%Y-%m-%dT%H:%M:%S.%f%z')
+    try:
+        # updateTime = datetime.strptime(work_simplified.get('updateTime'),
+        #                                '%Y-%m-%dT%H:%M:%S.%f%z')
+        update_string = work_simplified.get('updateTime')
+        # update_string[:-5] # '2018-09-22T12:23:44   .194Z'
+        updateTime = datetime.strptime(update_string[:-5],
+                                       '%Y-%m-%dT%H:%M:%S')
+    except Exception as e:
+        if VERBOSE:
+            print(repr(e))
+            print("\nmattermost api.format workmattermost")
+            print(work_simplified.get('updateTime'))
+        raise e
     given_date_formatted = updateTime.strftime('%Y-%m-%d')
     due_date = work_simplified.get('dueDate')
     if due_date:

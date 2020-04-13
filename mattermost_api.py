@@ -168,8 +168,19 @@ def get_all_channels():
 
 
 def get_post_for_channel(channel_id):
+    '''
+    methode que j'avais ajouté mais qui n'est pas dans la librairie
+
+    get_posts(self, channel_id):
+    return self.client.get(
+    self.endpoint + '/' + channel_id + '/posts'
+    )
+
+    '''
     driver = driver_create_login()
-    posts = driver.channels.get_posts(channel_id)
+    # posts = driver.channels.get_posts(channel_id)
+    posts = driver.client.get('/channels/' + channel_id + '/posts')
+
     if VERBOSE:
         print("\n channel post ids :")
         print("\nposts for channel {}".format(channel_id))

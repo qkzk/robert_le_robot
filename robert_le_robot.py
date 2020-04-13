@@ -127,9 +127,9 @@ class Robert:
         return self.channel_mode.get(channel_id)
 
     # for python < 3.8
-    # @asyncio.coroutine
-    # def __message_handler(self, message):
-    async def __message_handler(self, message):
+    @asyncio.coroutine
+    def __message_handler(self, message):
+        # async def __message_handler(self, message):
         '''traite un message et y répond via le bot'''
         if VERBOSE:
             print("\nmy_event_handler")
