@@ -57,13 +57,13 @@ def driver_create_login_get_info():
 def get_user(username, driver=None):
     '''Retourne les infos d'un utilisateur par son username'''
     if VERBOSE:
-        print(f"\nget user {username}")
+        print("\nget user {}".format(username))
     if driver is None:
         driver = driver_create()
     driver.login()
     user = driver.users.get_user_by_username(username)
     if VERBOSE:
-        print(f"\nuser {username} is")
+        print("\nuser {} is".format(username))
         print(user)
     return user
 
@@ -72,13 +72,13 @@ def get_user_by_id(user_id, driver=None):
     '''Retourne les infos d'un utilisateur par son user_id'''
     assert type(user_id) == str, "get_user_id: user id is not a string"
     if VERBOSE:
-        print(f"\nget user {user_id}")
+        print("\nget user {}".format(user_id))
     if driver is None:
         driver = driver_create()
     driver.login()
     user = driver.users.get_user(user_id)
     if VERBOSE:
-        print(f"\nuser {user_id} is")
+        print("\nuser {} is".format(user_id))
         print(user)
     return user
 
