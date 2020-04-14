@@ -22,7 +22,9 @@
   3. **`!robert python nom_d_objet`** : affiche l'aide d'un objet **python**,
   4. **`!robert latex syntaxe latex`** : tente d'évaluer une commande **latex**. J'arrondis la valeur après 4 décimales.
   5. **`!robert travail [nombre]`** (**`nombre`** est optionnel) : affiche une brève description des derniers travaux déposés sur classroom.
-  6. **`!robert poll "ce midi ?" "pizza" "kebab" "sushis"`** : crée un sondage avec chaque réponse et des réactions numérotées cliquables.
+  6. **`!robert compris [question]`** pose une question  à laquelle on peut répondre
+  7. **`!robert step nombre`** permet aux utilisateurs de voter sur leur progression
+  8. **`!robert poll "ce midi ?" "pizza" "kebab" "sushis"`** : crée un sondage avec chaque réponse et des réactions numérotées cliquables.
 
       ce midi ?
       :zero: pizza
