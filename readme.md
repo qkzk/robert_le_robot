@@ -36,14 +36,14 @@ L'objectif de Robert est d'apporter un peu de facilité aux enseignants et aux
     :one: kebab\
     :two: sushis
 
-* [ ] **`!robert progression 3`** : permet aux élèves de valider les étapes d'un travail en validant des réactions
+* [x] **`!robert step 3`** : permet aux élèves de valider les étapes d'un travail en validant des réactions
 
     Quelles étapes avez-vous réussies ?
 
     1 :heavy_check_mark:\
     2 :heavy_check_mark:\
     3 :checkered_flag:
-
+* [x] **`!robert compris question 3`** permet aux utilisateurs de cliquer sur compris/pas compris
 * [ ] **`python example list`** : afficher quelques exemples de syntaxes
 
     ```python
