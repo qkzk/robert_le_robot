@@ -17,6 +17,7 @@ def setup_app_log(logfile):
     Enregistre tout dans un seul fichier
     '''
     log_formatter = logging.Formatter(LOG_FORMAT)
+
     my_handler = RotatingFileHandler(logfile,
                                      mode='a',
                                      maxBytes=5 * 1024 * 1024,
