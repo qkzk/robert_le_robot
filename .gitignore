@@ -158,7 +158,6 @@ essais
 essais/*
 brouillon
 brouillon/*
-log*
 log/*
 deployer.sh
 *.service
