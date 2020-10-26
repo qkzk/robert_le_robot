@@ -79,7 +79,8 @@ class Post:
                 print(channel_state)
                 print("mute ???", channel_state.get("mute"))
                 print("##################################\n")
-            if self.__bot.get_channel_mode(self.__channel_id).get("mute"):
+            channel_mode = self.__bot.get_channel_mode(self.__channel_id)
+            if channel_mode is not None and channel_mode.get("mute"):
                 self.__check_back_normal_or_deleted()
 
             if self.__delete_post:
