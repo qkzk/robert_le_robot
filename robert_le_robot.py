@@ -71,8 +71,8 @@ class Robert:
     def username(self):
         return self.__username
 
-    def channels():
-        return self.__channel_ids
+    def channels(self):
+        return self.channel_ids
 
     def get_state(self):
         return self.__state
@@ -99,12 +99,13 @@ class Robert:
         if user_id in self.__state:
             command = self.__state[user_id]
             post = Post(self, None, None)
-            post.reply(command,
-                       sender_user_id=user_id,
-                       channel_id=channel_id)
+            post.reply()
+            # post.reply(command)
+            # sender_user_id=user_id,
+            # channel_id=channel_id)
             self.delete_state_for_user(user_id)
 
-    def __default_channel_mode(id, channel_id):
+    def __default_channel_mode(self, channel_id):
         return {
             "channel_id": channel_id,
             "muted": False,
